@@ -14,10 +14,4 @@ RUN npm install
 COPY . .
 
 # 6. 빌드
-RUN npm run build
-
-# 7. 빌드된 파일을 Nginx를 통해 서빙
-FROM nginx:alpine
-COPY --from=0 /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "start"]
