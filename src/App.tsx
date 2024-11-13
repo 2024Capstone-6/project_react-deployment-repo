@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Member from './pages/Member';
 import Japan from './pages/Japan';
 import Board from './pages/Board';
+import Special from './pages/Special';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="/member" element={<Member />} />
               <Route path="/japan" element={<Japan />} />
               <Route path="/board" element={<Board />} />
+              <Route path="/special" element={<Special />} />
             </Routes>
           </div>
         </div>

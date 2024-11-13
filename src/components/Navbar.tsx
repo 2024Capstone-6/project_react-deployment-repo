@@ -7,6 +7,7 @@ export default function Navbar() {
     { path: '/login', label: 'Login' },
     { path: '/japan', label: 'Japan' },
     { path: '/board', label: 'Board' },
+    { path: '/special', label: 'Special'},
   ];
 
   return (
