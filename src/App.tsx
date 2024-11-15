@@ -7,7 +7,7 @@ import Login from './pages/Login';
 import Member from './pages/Member';
 import Japan from './pages/Japan';
 import Board from './pages/Board';
-import Special from './pages/Special';
+import Special from './pages/Special/Special';
 
 function App() {
   return (
