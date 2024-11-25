@@ -5,27 +5,46 @@ import Modals from './Modals';
 
 interface MemberCardProps {
   onDelete: () => void;
+  memberOwnerId: number;
+  loggedInUserId: number;
 }
 
-const MemberCard: React.FC<MemberCardProps> = ({ onDelete }) => {
-  const [info, setInfo] = useState({ name: '', role: '', comment: '', email: '' });
+const MemberCard: React.FC<MemberCardProps> = ({
+  onDelete,
+  memberOwnerId,
+  loggedInUserId,
+}) => {
+  const [info, setInfo] = useState({
+    name: '',
+    role: '',
+    comment: '',
+    email: '',
+  });
   const [techStack, setTechStack] = useState<string[]>([]);
+  const [profileImage, setProfileImage] = useState<string>(
+    'https://www.yju.ac.kr/sites/kr/images/img_symbol_mark.png'
+  );
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isTechStackModalOpen, setIsTechStackModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const handleImageClick = (e: MouseEvent) => {
+  const isOwner = loggedInUserId === memberOwnerId;
+
+  const mouseImageClick = (e: MouseEvent) => {
+    if (!isOwner) return;
     e.preventDefault();
     setIsImageModalOpen(true);
   };
 
-  const handleInfoClick = (e: MouseEvent) => {
+  const mouseInfoClick = (e: MouseEvent) => {
+    if (!isOwner) return;
     e.preventDefault();
     setIsInfoModalOpen(true);
   };
 
-  const handleTechStackClick = (e: MouseEvent) => {
+  const mouseTechStackClick = (e: MouseEvent) => {
+    if (!isOwner) return;
     e.preventDefault();
     setIsTechStackModalOpen(true);
   };
@@ -40,7 +59,35 @@ const MemberCard: React.FC<MemberCardProps> = ({ onDelete }) => {
     setIsTechStackModalOpen(false);
   };
 
-  const handleRightClick = (e: MouseEvent) => {
+  const handleImageSave = async (selectedImage: File | null) => {
+    if (selectedImage) {
+      const formData = new FormData();
+      formData.append('file', selectedImage);
+
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProfileImage(data.url); // 서버에서 반환된 URL 사용
+        } else {
+          console.error('Error uploading image');
+        }
+      } catch (err) {
+        console.error('Error uploading image:', err);
+      }
+    }
+    setIsImageModalOpen(false);
+  };
+
+  const mouseRightClick = (e: MouseEvent) => {
+    if (!isOwner) return;
     e.preventDefault();
     setIsDeleteModalOpen(true);
   };
@@ -57,21 +104,22 @@ const MemberCard: React.FC<MemberCardProps> = ({ onDelete }) => {
   return (
     <div
       className="relative flex items-center gap-4 p-6 bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white rounded-lg shadow-lg"
-      onContextMenu={handleRightClick}
+      onContextMenu={mouseRightClick}
     >
       <div
-        onClick={handleImageClick}
-        onContextMenu={(e) => e.preventDefault()}
-        className="w-52 h-52 bg-cover bg-center rounded-lg shadow-md cursor-pointer"
-        style={{ backgroundImage: `url("https://picsum.photos/250")` }}
+        onClick={mouseImageClick}
+        className={`w-52 h-52 bg-cover bg-center rounded-lg shadow-md ${
+          isOwner ? 'cursor-pointer' : ''
+        }`}
+        style={{ backgroundImage: `url("${profileImage}")` }}
       ></div>
 
-      <MemberInfo info={info} onInfoClick={handleInfoClick} />
+      <MemberInfo info={info} onInfoClick={isOwner ? mouseInfoClick : undefined} />
 
       <div className="w-1/3">
         <TechStack
           techStack={techStack}
-          onStackClick={handleTechStackClick}
+          onStackClick={isOwner ? mouseTechStackClick : undefined}
           onContextMenu={(e) => e.preventDefault()}
         />
       </div>
@@ -87,6 +135,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ onDelete }) => {
         toggleTechStackModal={() => setIsTechStackModalOpen(!isTechStackModalOpen)}
         onSaveInfo={handleInfoSave}
         onSaveTechStack={handleTechStackSave}
+        onSaveImage={handleImageSave}
       />
 
       {isDeleteModalOpen && (
