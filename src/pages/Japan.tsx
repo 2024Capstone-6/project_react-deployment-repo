@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import ActivitiesModal from "../components/ActivitiesModal";
+
 interface Activity {
   id: number;
   mediaUrl: string;
@@ -8,6 +10,8 @@ interface Activity {
 const Japan: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [page, setPage] = useState<number>(1);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selcetedID, setSelectedID] = useState<number | null>(null);
 
   const limit = 3;
 
@@ -35,8 +39,10 @@ const Japan: React.FC = () => {
     setPage((prevPage) => (direction === 'next' ? prevPage + 1 : Math.max(prevPage - 1, 1)));
   };
 
-  const handleCardClick = (id: number) => {
+  const handleActivityClick = (id: number) => {
     console.log(`Card ${id} clicked`);
+    setSelectedID(id);
+    setIsModalOpen(true);
   };
 
   return (
@@ -67,7 +73,7 @@ const Japan: React.FC = () => {
             <div
               key={activity.id}
               className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
-              onClick={() => handleCardClick(activity.id)}
+              onClick={() => handleActivityClick(activity.id)}
             >
               {/* 게시물의 사진을 표시 */}
               {activity.mediaUrl ? (
@@ -91,6 +97,11 @@ const Japan: React.FC = () => {
           >
             &gt;
           </button>
+          {/* 모달 컴포넌트 추가 */}
+          <ActivitiesModal 
+           isOpen={isModalOpen} 
+           onClose={() => setIsModalOpen(false)} 
+           activityId={selcetedID}/>
         </div>
       </div>
 
