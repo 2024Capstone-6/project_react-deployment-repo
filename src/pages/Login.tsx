@@ -35,6 +35,7 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
+        // localStorage.setItem("access_token", data.access_token) // JWT 토큰 로컬 스토리지에 저장
         sessionStorage.setItem("Email", data.email);
         sessionStorage.setItem("Nickname", data.nickname);
         sessionStorage.setItem("UserId", data.id);
