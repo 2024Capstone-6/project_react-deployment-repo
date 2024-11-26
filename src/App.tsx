@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate,useParams } from 'react-router-dom';
+
 import './App.css';
 
 import Navbar from './components/Navbar';
@@ -6,11 +7,14 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Member from './pages/Member';
 import Japan from './pages/Japan';
-import Board from './pages/Board';
+import Board from './pages/Board/Board';
 import Special from './pages/Special';
-import CreateBoard from "./pages/CrateBoard";
+import CreateBoard from "./pages/Board/CrateBoard";
+import UpdateBoard from './pages/Board/UpdateBoard';
+import BoardIN from './pages/Board/BoardIN';
 
 function App() {
+  const {idx} = useParams()
   return (
     <div className="App">
       <Router>
@@ -26,6 +30,8 @@ function App() {
               <Route path="/board" element={<Board />} />
               <Route path="/special" element={<Special />} />
               <Route path="/createBoard" element={<CreateBoard />} />
+              <Route path="/updateBoard" element={<UpdateBoard />} />
+              <Route path="/board/:idx" element={<BoardIN />} />
             </Routes>
           </div>
         </div>

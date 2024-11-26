@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
-import "../style/board.css"
+import "../../style/board.css"
 
 
 interface Board {
@@ -38,7 +38,7 @@ const BoardPage: React.FC = () => {
         </div>
         <div className="boardbox">
           {board.map((board) => (
-            <div key={board.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
+            <div key={board.id} className="boardlist" onClick={() => navigate(`${board.id}`)}>  
               <h2>제목:{board.title}</h2>
               <p>내용:{board.content}</p>
             </div>

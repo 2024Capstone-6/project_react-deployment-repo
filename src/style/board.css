@@ -10,7 +10,7 @@ body {
 .mainpage {
   background-color: whitesmoke;
   width: 60%;
-  height: 800px;
+  height: 1200px;
   float: left;
   padding: 10px;
 }
@@ -31,4 +31,11 @@ body {
 
 .boardbox {
   background-color: white;
+}
+
+.boardlist {
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: '10px';
+  padding: '10px'
 }
