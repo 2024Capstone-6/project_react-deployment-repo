@@ -8,6 +8,7 @@ import Member from './pages/Member';
 import Japan from './pages/Japan';
 import Board from './pages/Board';
 import Special from './pages/Special';
+import CreateBoard from "./pages/CrateBoard";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="/japan" element={<Japan />} />
               <Route path="/board" element={<Board />} />
               <Route path="/special" element={<Special />} />
+              <Route path="/createBoard" element={<CreateBoard />} />
             </Routes>
           </div>
         </div>

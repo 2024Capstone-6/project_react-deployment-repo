@@ -15,7 +15,7 @@ body {
   padding: 10px;
 }
 
-.createPost {
+.createBoard {
   background-color: blue;
   float: right;
   cursor: pointer
