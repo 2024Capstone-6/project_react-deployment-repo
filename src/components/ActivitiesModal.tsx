@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface ActivitiesModalProps {
     isOpen: boolean;
@@ -19,24 +20,19 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ isOpen, onClose, acti
     const [activity, setActivity] = useState<Activity | null>(null);
   
     useEffect(() => {
-      if (activityId !== null) {
-        const fetchActivity = async () => {
-          try {
-            const response = await fetch(`http://localhost:3001/activities/${activityId}`);
-            const data = await response.json();
-            if (response.ok) {
-              setActivity(data);
-            } else {
-              console.error('Error fetching activity:', data.message);
+        if (activityId !== null) {
+          const fetchActivity = async () => {
+            try {
+              const response = await axios.get(`http://localhost:3001/activities/${activityId}`);
+              setActivity(response.data);
+            } catch (error) {
+              console.error('Error fetching activity:', error);
             }
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        };
-  
-        fetchActivity();
-      }
-    }, [activityId]);
+          };
+    
+          fetchActivity();
+        }
+      }, [activityId]);
   
     if (!isOpen) {
       return null;

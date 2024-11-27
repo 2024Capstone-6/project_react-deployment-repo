@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 import ActivitiesModal from "../components/ActivitiesModal";
 
@@ -15,20 +16,20 @@ const Japan: React.FC = () => {
 
   const limit = 3;
 
-  // 페이지네이션 데이터를 가져오는 함수
-  const fetchPaginatedPosts = async (page: number) => {
-    try {
-      const response = await fetch(`http://localhost:3001/activities/page?page=${page}&limit=${limit}`);
-      const data = await response.json();
-      if (response.ok) {
-        setActivities(data);
-      } else {
-        console.error('Error fetching paginated posts:', data.message);
+ // 페이지네이션 데이터를 가져오는 함수
+ const fetchPaginatedPosts = async (page: number) => {
+  try {
+    const response = await axios.get(`http://localhost:3001/activities/page`, {
+      params: {
+        page: page,
+        limit: limit
       }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
+    });
+    setActivities(response.data);
+  } catch (error) {
+    console.error('Error fetching paginated posts:', error);
+  }
+};
 
   // 페이지 변경 시 데이터 로드
   useEffect(() => {
