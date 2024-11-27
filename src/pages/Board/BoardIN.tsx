@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 // 게시글 데이터 타입 정의
@@ -11,6 +11,7 @@ interface Board {
 const BoardIN: React.FC = () => {
   const { idx } = useParams(); // URL에서 게시글 ID를 가져옴
   const [board, setBoard] = useState<Board | null>(null); // 게시글 데이터를 저장
+  const navigate = useNavigate(); // 페이지 이동을 위한 useNavigate
 
   // 게시글 데이터 가져오기 함수
   const getBoard = async () => {
@@ -38,6 +39,17 @@ const BoardIN: React.FC = () => {
       <div style={{ marginTop: "20px", whiteSpace: "pre-wrap" }}>
         {board.content} {/* 게시글 내용 */}
       </div>
+      <button onClick={() => navigate(`/updateBoard/${idx}`)}>수정하기</button> {/* 수정하기 버튼 */}
+      <button onClick={() => {
+        try {
+          axios.delete(`http://localhost:3001/board/${idx}`);
+        navigate('/board');
+        alert("삭제되었습니다!")
+        } catch (error) {
+          console.error("게시글 데이터를 삭제하는 중 오류 발생:", error);
+          alert("게시글 데이터를 삭제하지 못했습니다.");
+        }
+      }}>삭제하기</button>
     </div>
   );
 };

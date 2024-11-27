@@ -39,3 +39,27 @@ body {
   margin: '10px';
   padding: '10px'
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button,
+.pagination span {
+  margin: 0 5px;
+}
+
+.pagination button.active {
+  background-color: #007BFF;
+  color: white;
+}
+
+.pagination button[disabled] {
+  background-color: #ccc;
+}
+
+.pagination .ellipsis {
+  color: #999;
+}

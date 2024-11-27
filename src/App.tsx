@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate,useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import './App.css';
 
@@ -14,7 +14,6 @@ import UpdateBoard from './pages/Board/UpdateBoard';
 import BoardIN from './pages/Board/BoardIN';
 
 function App() {
-  const {idx} = useParams()
   return (
     <div className="App">
       <Router>
@@ -30,7 +29,7 @@ function App() {
               <Route path="/board" element={<Board />} />
               <Route path="/special" element={<Special />} />
               <Route path="/createBoard" element={<CreateBoard />} />
-              <Route path="/updateBoard" element={<UpdateBoard />} />
+              <Route path="/updateBoard/:idx" element={<UpdateBoard />} />
               <Route path="/board/:idx" element={<BoardIN />} />
             </Routes>
           </div>

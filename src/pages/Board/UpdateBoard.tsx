@@ -12,13 +12,13 @@ const UpdateBoard: React.FC = () => {
   const [board, setBoard] = useState<Board>({ title: "", content: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate(); // 리디렉션을 위한 useNavigate 훅
-  const { id } = useParams<{ id: string }>(); // URL에서 게시글 ID를 가져옴
+  const { idx } = useParams<{ idx: string }>(); // URL에서 게시글 ID를 가져옴
 
   // 기존 게시글 데이터 가져오기
   useEffect(() => {
     const fetchBoard = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/board/${id}`);
+        const response = await axios.get(`http://localhost:3001/board/${idx}`);
         setBoard(response.data); // 기존 게시글 데이터를 상태에 설정
       } catch (error) {
         console.error("게시글 데이터를 불러오는 중 오류 발생:", error);
@@ -27,7 +27,7 @@ const UpdateBoard: React.FC = () => {
     };
 
     fetchBoard();
-  }, [id]);
+  }, [idx]);
 
   // 입력값 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,7 +42,7 @@ const UpdateBoard: React.FC = () => {
 
     try {
       // Axios PATCH 요청
-      await axios.patch(`http://localhost:3001/board/${id}`, board);
+      await axios.patch(`http://localhost:3001/board/${idx}`, board);
       alert("게시글이 성공적으로 수정되었습니다!");
       navigate("/board"); // 수정 후 /board로 리디렉션
     } catch (error) {
