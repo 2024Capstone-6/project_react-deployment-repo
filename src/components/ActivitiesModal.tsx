@@ -43,17 +43,21 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({ isOpen, onClose, acti
     }
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center z-50">
-          <div className="bg-white m-auto p-6 w-4/5 h-[80vh] rounded-lg shadow-lg relative">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex z-50">
+          <div className="bg-white m-auto p-6 w-[80vw] h-[80vh] rounded-lg shadow-lg relative">
             <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-700" onClick={onClose}>
               &times;
             </button>
             {activity ? (
-              <div>
-                <h2 className="text-2xl font-bold mb-4">{activity.title}</h2>
+              <div className="flex w-full h-full">
+              <img src={activity.mediaUrl} alt={activity.title} className="bg-slate-400 w-2/5 h-full object-cover rounded-l-lg" />
+              <div className="w-3/5 p-6 flex flex-col text-left justify-center">
+                <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
+                <p className="mb-4">{activity.email}</p>
+                <p className="mb-4">{activity.date}</p>
                 <p className="mb-4">{activity.content}</p>
-                {/* 기타 활동 정보 */}
               </div>
+            </div>
             ) : (
               <p>Loading...</p>
             )}
