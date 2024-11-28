@@ -12,37 +12,48 @@ const Japan: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
 
   const limit = 3;
 
- // 페이지네이션 데이터를 가져오는 함수
- const fetchPaginatedPosts = async (page: number) => {
-  try {
-    const response = await axios.get(`http://localhost:3001/activities/page`, {
-      params: {
-        page: page,
-        limit: limit
-      }
-    });
-    setActivities(response.data);
-  } catch (error) {
-    console.error('Error fetching paginated posts:', error);
-  }
-};
+  // 페이지네이션 데이터를 가져오는 함수
+  const fetchPaginatedPosts = async (page: number) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/activities/page`,
+        {
+          params: {
+            page: page,
+            limit: limit,
+          },
+        }
+      );
+      setActivities(response.data);
+    } catch (error) {
+      console.error("Error fetching paginated posts:", error);
+    }
+  };
 
   // 페이지 변경 시 데이터 로드
   useEffect(() => {
     fetchPaginatedPosts(page);
   }, [page]);
 
-  const handlePageChange = (direction: 'prev' | 'next') => {
-    setPage((prevPage) => (direction === 'next' ? prevPage + 1 : Math.max(prevPage - 1, 1)));
+  const handlePageChange = (direction: "prev" | "next") => {
+    setPage((prevPage) =>
+      direction === "next" ? prevPage + 1 : Math.max(prevPage - 1, 1)
+    );
   };
 
   const handleActivityClick = (id: number) => {
     console.log(`Card ${id} clicked`);
     setSelectedID(id);
+    setIsModalOpen(true);
+  };
+
+  const handleCreateActivity = () => {
+    setSelectedID(null);
     setIsModalOpen(true);
   };
 
@@ -58,6 +69,7 @@ const Japan: React.FC = () => {
           />
           <button
             className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4"
+            onClick={handleCreateActivity}
           >
             +
           </button>
@@ -65,44 +77,45 @@ const Japan: React.FC = () => {
         <div className="activities-container relative">
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            onClick={() => handlePageChange('prev')}
+            onClick={() => handlePageChange("prev")}
           >
             &lt;
           </button>
           <div className="flex overflow-x-auto space-x-4 mx-auto w-[calc(100%-1rem)] justify-center">
-          {activities.map((activity) => (
-            <div
-              key={activity.id}
-              className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
-              onClick={() => handleActivityClick(activity.id)}
-            >
-              {/* 게시물의 사진을 표시 */}
-              {activity.mediaUrl ? (
-                <img
-                  src={activity.mediaUrl}
-                  alt={`Activity ${activity.id}`}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                // 사진이 없는 경우 기본 배경 표시
-                <div className="flex items-center justify-center w-full h-full bg-gray-300 text-gray-700">
-                  No Image
-                </div>
-              )}
-            </div>
-          ))}
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
+                onClick={() => handleActivityClick(activity.id)}
+              >
+                {/* 게시물의 사진을 표시 */}
+                {activity.mediaUrl ? (
+                  <img
+                    src={activity.mediaUrl}
+                    alt={`Activity ${activity.id}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  // 사진이 없는 경우 기본 배경 표시
+                  <div className="flex items-center justify-center w-full h-full bg-gray-300 text-gray-700">
+                    No Image
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
           <button
             className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            onClick={() => handlePageChange('next')}
+            onClick={() => handlePageChange("next")}
           >
             &gt;
           </button>
           {/* 모달 컴포넌트 추가 */}
-          <ActivitiesModal 
-           isOpen={isModalOpen} 
-           onClose={() => setIsModalOpen(false)} 
-           activityId={selcetedID}/>
+          <ActivitiesModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            activityId={selcetedID}
+          />
         </div>
       </div>
 
@@ -120,9 +133,7 @@ const Japan: React.FC = () => {
         </div>
         <div className="relative">
           <div className="relative">
-            <button
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            >
+            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded">
               &lt;
             </button>
             <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
@@ -131,9 +142,7 @@ const Japan: React.FC = () => {
                 placeholder="Large text box"
               />
             </div>
-            <button
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            >
+            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded">
               &gt;
             </button>
           </div>
