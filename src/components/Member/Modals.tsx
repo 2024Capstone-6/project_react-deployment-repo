@@ -11,7 +11,7 @@ interface ModalsProps {
   toggleTechStackModal: () => void;
   onSaveInfo: (updatedInfo: { name: string; role: string; comment: string; email: string }) => void;
   onSaveTechStack: (updatedStacks: string[]) => void;
-  onSaveImage: (imageUrl: string) => void; // 파일 업로드 시 URL 저장
+  onSaveImage: (selectedImage: File | null, updatedImageUrl: (url: string) => void) => void; // updatedImageUrl 추가
 }
 
 const Modals: React.FC<ModalsProps> = ({
@@ -32,46 +32,27 @@ const Modals: React.FC<ModalsProps> = ({
   const [selectedStacks, setSelectedStacks] = useState<string[]>(techStack);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  // Initialize states when modals open
   useEffect(() => {
     if (isInfoModalOpen) setTempInfo(info);
     if (isTechStackModalOpen) setSelectedStacks(techStack);
     if (isImageModalOpen) setSelectedImage(null);
   }, [isInfoModalOpen, isTechStackModalOpen, isImageModalOpen, info, techStack]);
 
-  // File change handler
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
   };
 
-  // File upload handler
-  const uploadImage = async () => {
-    if (!selectedImage) return;
-
-    const formData = new FormData();
-    formData.append('file', selectedImage);
-
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+  const saveImage = () => {
+    if (selectedImage) {
+      onSaveImage(selectedImage, (url: string) => {
+        // updatedImageUrl 콜백으로 새로운 URL 반영
+        setSelectedImage(null); // 선택된 파일 초기화
       });
-
-      if (!response.ok) {
-        console.error('Failed to upload image');
-        return;
-      }
-
-      const data = await response.json();
-      onSaveImage(data.imageUrl); // 서버에서 받은 이미지 URL 저장
-      toggleImageModal(); // 모달 닫기
-    } catch (error) {
-      console.error('Error uploading image:', error);
     }
+    toggleImageModal(); // 모달 닫기
   };
 
-  // Toggle selection for tech stacks
   const toggleStackSelection = (stack: string) => {
     if (selectedStacks.includes(stack)) {
       setSelectedStacks(selectedStacks.filter((s) => s !== stack));
@@ -80,7 +61,6 @@ const Modals: React.FC<ModalsProps> = ({
     }
   };
 
-  // Draw modal
   const drawModal = (
     isOpen: boolean,
     title: string,
@@ -105,7 +85,7 @@ const Modals: React.FC<ModalsProps> = ({
               onClick={saveFunction}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Upload
+              Save
             </button>
           </div>
         </div>
@@ -115,7 +95,6 @@ const Modals: React.FC<ModalsProps> = ({
 
   return (
     <>
-      {/* Image Upload Modal */}
       {drawModal(
         isImageModalOpen,
         'Change Profile Image',
@@ -127,11 +106,10 @@ const Modals: React.FC<ModalsProps> = ({
             className="p-2 border rounded"
           />
         </div>,
-        uploadImage, // 이미지 업로드 실행
+        saveImage,
         toggleImageModal
       )}
 
-      {/* Information Edit Modal */}
       {drawModal(
         isInfoModalOpen,
         'Edit Information',
@@ -169,10 +147,9 @@ const Modals: React.FC<ModalsProps> = ({
         toggleInfoModal
       )}
 
-      {/* Tech Stack Modal */}
       {drawModal(
         isTechStackModalOpen,
-        'Add Tech Stack',
+        'Edit Tech Stack',
         <div className="grid grid-cols-3 gap-4">
           {availableTechStacks.map((stack) => (
             <button
@@ -183,7 +160,7 @@ const Modals: React.FC<ModalsProps> = ({
               }`}
             >
               <img
-                src={`/images/Member/${stack}.png`} // 이미지 경로
+                src={`/images/Member/${stack}.png`}
                 alt={stack}
                 className="w-full h-full object-cover rounded-full"
               />
