@@ -23,9 +23,9 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
   const handleLogin = async () => {
     try {
       const response = await fetch("http://localhost:3001/userdt/login", {
-        method: "POST",
+        method: "POST", // 새로운 리소스를 생성하거나 데이터를 서버에 보낼 때 사용
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", // // 요청 본문의 콘텐츠 타입이 JSON 형식임을 서버에 알림
         },
         body: JSON.stringify({
           email: Email,
@@ -35,11 +35,13 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // localStorage.setItem("access_token", data.access_token) // JWT 토큰 로컬 스토리지에 저장
-        sessionStorage.setItem("Email", data.email);
-        sessionStorage.setItem("Nickname", data.nickname);
-        sessionStorage.setItem("UserId", data.id);
-        setUser(data.nickname); // 로그인 성공 시 사용자 이름 저장
+        console.log(data); // 서버에서 받은 데이터 확인
+        
+        sessionStorage.setItem("access_token", data.access_token);
+        sessionStorage.setItem("Email", data.user.email);
+        sessionStorage.setItem("Nickname", data.user.nickname);
+        sessionStorage.setItem("UserId", data.user.id);
+        setUser(data.user.nickname); // 로그인 성공 시 사용자 이름 저장
         navigate("/"); // 메인 페이지로 이동
       } else {
         const errorData = await response.json();
