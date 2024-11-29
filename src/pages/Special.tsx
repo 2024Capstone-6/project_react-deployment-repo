@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { children } from 'solid-js'
 
 const Special = () => {
+  const [add_Modal,setAdd_Modal] = useState(false)
   const [Question,setQuestion] = useState('')
   const [answer,setAnswer] = useState('')
   const [uid,setUid] = useState('')
@@ -11,12 +12,14 @@ const Special = () => {
     rand() 
   },[])
 
-  const add_Question = () =>{
-    const auth = sessionStorage.getItem('access_token')
-    axios.get("http://localhost:3001/special/auth")
+/*   const add_Question = () =>{
+    const auth = axios.get("http://localhost:3001/special/auth")
+    axios.post("http://localhost:3001/",
+      {
+        Qusetin :'' ,
+      })
     
-    
-  }
+  } */
 
   const  rand = async ()=>{ // 랜덤으로 문제 받아오기
     const testarr=await axios.get("http://localhost:3001/special")
@@ -55,8 +58,8 @@ const Special = () => {
 
       <div className="flex flex-col justify-center items-center flex-1 bg-gray-100 space-y-6 relative">
         <button
-          // onClick={} 클릭시 모달창 띄우기
           className="absolute top-4 right-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+          onClick={()=>{setAdd_Modal(!add_Modal)}} 
         >글쓰기</button>
         <div className="w-full text-center text-xl font-semibold">
           아래 일본어의 한국어 해석을 작성하시오.
@@ -103,6 +106,57 @@ const Special = () => {
         </form>
         
       </div>
+      {add_Modal ?     
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+        onClick={()=>{setAdd_Modal(!add_Modal)}}
+      >
+      <div
+        className="bg-white p-8 rounded-lg shadow-lg w-[1000px] h-auto max-w-full"
+        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫히지 않도록 설정
+      >
+      <h3 className="text-2xl font-bold mb-6">문제 작성</h3>
+      <form
+        onSubmit={
+          (e)=>{
+            e.preventDefault()
+            const add_q = e.currentTarget.Q.value
+            const add_a = e.currentTarget.A.value
+            console.log(add_q, add_a)
+            setAdd_Modal(!add_Modal)
+          }}
+      >
+          <input
+            type="text"
+            className="w-full p-3 border rounded mb-6"
+            placeholder="문제를 입력하세요" 
+            name='Q'
+          />
+
+          <h3 className="text-2xl font-bold mb-6">답 작성</h3>
+          <input
+            type="text"
+            className="w-full p-3 border rounded mb-6"
+            placeholder="답을 입력하세요"
+            name='A'
+          />
+
+          <button
+            className="w-full bg-green-500 text-white py-3 rounded mb-4 hover:bg-green-600 transition"
+            type='submit'
+          >
+            업로드
+          </button>
+        </form>
+        <button
+          className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600 transition"
+          onClick={()=>{setAdd_Modal(!add_Modal)}}
+        >
+          닫기
+        </button>
+      </div>
+    </div>
+        :''}
     </div>
 
   )
