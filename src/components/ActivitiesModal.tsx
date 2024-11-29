@@ -31,6 +31,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   activityId,
 }) => {
   const [activity, setActivity] = useState<Activity>(defaultActivity);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (activityId !== null) {
@@ -75,6 +76,19 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
   };
 
+  const handleEditActivity = async () => {
+    try {
+      await axios.patch(
+        `http://localhost:3001/activities/${activityId}`,
+        activity
+      );
+      setIsEditing(false);
+      onClose();
+    } catch (error) {
+      console.error("Error editing activity:", error);
+    }
+  };
+
   const handleDeleteActivity = async () => {
     // 사용자에게 삭제 확인
     const isConfirmed = window.confirm("정말로 이 활동을 삭제하시겠습니까?");
@@ -83,7 +97,6 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       try {
         await axios.delete(`http://localhost:3001/activities/${activityId}`);
         onClose();
-        window.location.reload();
       } catch (error) {
         console.error("Error deleting activity:", error);
       }
@@ -149,19 +162,50 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
               className="bg-slate-400 w-2/5 h-full object-cover rounded-l-lg"
             />
             <div className="w-3/5 p-6 flex flex-col text-left justify-center">
-              <button className="absolute bottom-4 right-20 border border-blue-500 text-blue-500 p-1 rounded">
-                Edit
-              </button>
-              <button
-                onClick={handleDeleteActivity}
-                className="absolute bottom-4 right-5 border border-red-500 text-red-500 p-1 rounded"
-              >
-                Delete
-              </button>
-              <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
-              <p className="mb-4">{activity.email}</p>
-              <p className="mb-4">{activity.date}</p>
-              <p className="mb-4">{activity.content}</p>
+              {isEditing ? (
+                <>
+                  <input
+                    type="text"
+                    value={activity.title}
+                    onChange={(e) =>
+                      setActivity({ ...activity, title: e.target.value })
+                    }
+                    className="text-2xl font-bold mb-4 text-left border border-gray-300 rounded p-2 w-full"
+                  />
+                  <p className="mb-4">{activity.email}</p>
+                  <p className="mb-4">{activity.date}</p>
+                  <textarea
+                    value={activity.content}
+                    onChange={(e) =>
+                      setActivity({ ...activity, content: e.target.value })
+                    }
+                    className="mb-4 text-left border border-gray-300 rounded p-2 w-full h-40"
+                  />
+                  <button
+                    onClick={handleEditActivity}
+                    className="absolute bottom-4 right-6 bg-blue-500 text-white p-1 rounded w-20"
+                  >
+                    Save
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
+                  <p className="mb-4">{activity.content}</p>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="absolute bottom-4 right-20 border border-blue-500 text-blue-500 p-1 rounded"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleDeleteActivity}
+                    className="absolute bottom-4 right-5 border border-red-500 text-red-500 p-1 rounded"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
           </div>
         ) : (
