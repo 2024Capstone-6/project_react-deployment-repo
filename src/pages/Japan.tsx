@@ -12,7 +12,6 @@ const Japan: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
 
   const limit = 3;

@@ -16,20 +16,20 @@ interface Activity {
   mediaUrl: string;
 }
 
+const defaultActivity = {
+  id: 0,
+  email: "",
+  date: "",
+  title: "",
+  content: "",
+  mediaUrl: "",
+};
+
 const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   isOpen,
   onClose,
   activityId,
 }) => {
-  const defaultActivity = {
-    id: 0,
-    email: "",
-    date: "",
-    title: "",
-    content: "",
-    mediaUrl: "",
-  };
-
   const [activity, setActivity] = useState<Activity>(defaultActivity);
 
   useEffect(() => {
@@ -47,7 +47,6 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 
       fetchActivity();
     } else {
-      // activityId가 null일 때 기본값으로 초기화
       setActivity(defaultActivity);
     }
   }, [activityId]);
