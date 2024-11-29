@@ -75,6 +75,21 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
   };
 
+  const handleDeleteActivity = async () => {
+    // 사용자에게 삭제 확인
+    const isConfirmed = window.confirm("정말로 이 활동을 삭제하시겠습니까?");
+
+    if (isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:3001/activities/${activityId}`);
+        onClose();
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting activity:", error);
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex z-50">
       <div className="bg-white m-auto p-6 w-[80vw] h-[80vh] rounded-lg shadow-lg relative">
@@ -134,6 +149,15 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
               className="bg-slate-400 w-2/5 h-full object-cover rounded-l-lg"
             />
             <div className="w-3/5 p-6 flex flex-col text-left justify-center">
+              <button className="absolute bottom-4 right-20 border border-blue-500 text-blue-500 p-1 rounded">
+                Edit
+              </button>
+              <button
+                onClick={handleDeleteActivity}
+                className="absolute bottom-4 right-5 border border-red-500 text-red-500 p-1 rounded"
+              >
+                Delete
+              </button>
               <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
               <p className="mb-4">{activity.email}</p>
               <p className="mb-4">{activity.date}</p>
