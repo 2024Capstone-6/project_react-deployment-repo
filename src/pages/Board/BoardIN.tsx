@@ -6,6 +6,7 @@ import axios from "axios";
 interface Board {
   title: string;
   content: string;
+  imgurl?: string;
 }
 
 const BoardIN: React.FC = () => {
@@ -39,6 +40,9 @@ const BoardIN: React.FC = () => {
       <div style={{ marginTop: "20px", whiteSpace: "pre-wrap" }}>
         {board.content} {/* 게시글 내용 */}
       </div>
+      {board.imgurl && (
+        <img src={board.imgurl} alt="게시글 이미지" style={{ width: "100%", marginTop: "20px" }} />
+      )}
       <button onClick={() => navigate(`/updateBoard/${idx}`)}>수정하기</button> {/* 수정하기 버튼 */}
       <button onClick={() => {
         try {

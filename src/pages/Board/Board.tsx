@@ -7,6 +7,7 @@ interface Board {
   id: number;
   title: string;
   content: string;
+  imgurl?: string;
 }
 
 const BoardPage: React.FC = () => {
@@ -91,6 +92,9 @@ const BoardPage: React.FC = () => {
               <div key={item.id} className="boardlist" onClick={() => navigate(`${item.id}`)}>
                 <h2>제목: {item.title}</h2>
                 <p>내용: {item.content}</p>
+                {item.imgurl && (
+                <img src={item.imgurl} alt="게시글 이미지" style={{ width: "100px", height: "auto", marginTop: "10px" }} />
+              )}
               </div>
             ))
           )}
