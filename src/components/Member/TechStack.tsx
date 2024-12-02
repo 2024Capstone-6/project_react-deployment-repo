@@ -1,9 +1,9 @@
 import React, { MouseEvent } from 'react';
 
 interface TechStackProps {
-  techStack: string[]; // 기술 스택 이름 배열
+  techStack: string[]; // 기술 스택 배열
   onStackClick?: (e: MouseEvent<HTMLDivElement>) => void; // 선택적 클릭 이벤트
-  onContextMenu: (e: MouseEvent<HTMLDivElement>) => void; // 우클릭 방지 이벤트 핸들러
+  onContextMenu?: (e: MouseEvent<HTMLDivElement>) => void; // 우클릭 방지 이벤트 핸들러 (선택적)
 }
 
 const TechStack: React.FC<TechStackProps> = ({ techStack, onStackClick, onContextMenu }) => {

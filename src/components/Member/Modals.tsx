@@ -1,17 +1,17 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 
 interface ModalsProps {
-  isImageModalOpen: boolean;
-  isInfoModalOpen: boolean;
-  isTechStackModalOpen: boolean;
-  info: { name: string; role: string; comment: string; email: string };
-  techStack: string[];
-  toggleImageModal: () => void;
-  toggleInfoModal: () => void;
-  toggleTechStackModal: () => void;
-  onSaveInfo: (updatedInfo: { name: string; role: string; comment: string; email: string }) => void;
-  onSaveTechStack: (updatedStacks: string[]) => void;
-  onSaveImage: (selectedImage: File | null, updatedImageUrl: (url: string) => void) => void; // updatedImageUrl 추가
+  isImageModalOpen: boolean; // 이미지 모달 열림 여부
+  isInfoModalOpen: boolean; // 정보 수정 모달 열림 여부
+  isTechStackModalOpen: boolean; // 기술 스택 수정 모달 열림 여부
+  info: { name: string; role: string; comment: string; email: string }; // 멤버 정보
+  techStack: string[]; // 기술 스택 배열
+  toggleImageModal: () => void; // 이미지 모달 토글 함수
+  toggleInfoModal: () => void; // 정보 수정 모달 토글 함수
+  toggleTechStackModal: () => void; // 기술 스택 수정 모달 토글 함수
+  onSaveInfo: (updatedInfo: { name: string; role: string; comment: string; email: string }) => void; // 정보 저장 함수
+  onSaveTechStack: (updatedStacks: string[]) => void; // 기술 스택 저장 함수
+  onSaveImage: (selectedImage: File | null) => void; // 이미지 저장 함수
 }
 
 const Modals: React.FC<ModalsProps> = ({
@@ -27,32 +27,25 @@ const Modals: React.FC<ModalsProps> = ({
   onSaveTechStack,
   onSaveImage,
 }) => {
-  const availableTechStacks = ['react', 'typescript', 'node', 'tailwind', 'docker'];
-  const [tempInfo, setTempInfo] = useState(info);
-  const [selectedStacks, setSelectedStacks] = useState<string[]>(techStack);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const availableTechStacks = ['react', 'typescript', 'node', 'tailwind', 'docker']; // 선택 가능한 기술 스택
+  const [tempInfo, setTempInfo] = useState(info); // 임시 정보 상태
+  const [selectedStacks, setSelectedStacks] = useState<string[]>(techStack); // 선택된 기술 스택
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); // 선택된 이미지 파일
 
+  // 모달 열릴 때 상태 초기화
   useEffect(() => {
     if (isInfoModalOpen) setTempInfo(info);
     if (isTechStackModalOpen) setSelectedStacks(techStack);
     if (isImageModalOpen) setSelectedImage(null);
   }, [isInfoModalOpen, isTechStackModalOpen, isImageModalOpen, info, techStack]);
 
+  // 이미지 선택 핸들러
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedImage(file);
   };
 
-  const saveImage = () => {
-    if (selectedImage) {
-      onSaveImage(selectedImage, (url: string) => {
-        // updatedImageUrl 콜백으로 새로운 URL 반영
-        setSelectedImage(null); // 선택된 파일 초기화
-      });
-    }
-    toggleImageModal(); // 모달 닫기
-  };
-
+  // 기술 스택 선택/해제 토글
   const toggleStackSelection = (stack: string) => {
     if (selectedStacks.includes(stack)) {
       setSelectedStacks(selectedStacks.filter((s) => s !== stack));
@@ -61,6 +54,7 @@ const Modals: React.FC<ModalsProps> = ({
     }
   };
 
+  // 모달 렌더링 함수
   const drawModal = (
     isOpen: boolean,
     title: string,
@@ -95,6 +89,7 @@ const Modals: React.FC<ModalsProps> = ({
 
   return (
     <>
+      {/* 이미지 변경 모달 */}
       {drawModal(
         isImageModalOpen,
         'Change Profile Image',
@@ -106,10 +101,14 @@ const Modals: React.FC<ModalsProps> = ({
             className="p-2 border rounded"
           />
         </div>,
-        saveImage,
+        () => {
+          onSaveImage(selectedImage);
+          toggleImageModal();
+        },
         toggleImageModal
       )}
 
+      {/* 정보 수정 모달 */}
       {drawModal(
         isInfoModalOpen,
         'Edit Information',
@@ -147,6 +146,7 @@ const Modals: React.FC<ModalsProps> = ({
         toggleInfoModal
       )}
 
+      {/* 기술 스택 수정 모달 */}
       {drawModal(
         isTechStackModalOpen,
         'Edit Tech Stack',

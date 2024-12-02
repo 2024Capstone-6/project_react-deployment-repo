@@ -100,7 +100,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ memberData, onDelete, onUpdate 
         <TechStack
           techStack={memberData.techStack}
           onStackClick={() => setIsTechStackModalOpen(true)}
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()} // 우클릭 방지 핸들러 추가
         />
       </div>
 
