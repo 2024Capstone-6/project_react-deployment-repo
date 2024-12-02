@@ -32,6 +32,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 }) => {
   const [activity, setActivity] = useState<Activity>(defaultActivity);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (activityId !== null) {
@@ -59,17 +60,26 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   const handleCreateActivity = async () => {
     if (activity) {
       try {
-        // 현재 날짜를 YYYY-MM-DD 형식으로 포맷팅
         const today = new Date();
         const formattedDate = today.toISOString().split("T")[0];
 
-        const activityWithDate = {
-          ...activity,
-          date: formattedDate,
-        };
+        const formData = new FormData();
+        formData.append("email", activity.email);
+        formData.append("date", formattedDate);
+        formData.append("title", activity.title);
+        formData.append("content", activity.content);
 
-        await axios.post(`http://localhost:3001/activities`, activityWithDate);
+        if (selectedFile) {
+          formData.append("image", selectedFile);
+        }
+
+        await axios.post(`http://localhost:3001/activities`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
         onClose();
+        window.location.reload();
       } catch (error) {
         console.error("Error creating activity:", error);
       }
@@ -90,16 +100,27 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   };
 
   const handleDeleteActivity = async () => {
-    // 사용자에게 삭제 확인
     const isConfirmed = window.confirm("정말로 이 활동을 삭제하시겠습니까?");
 
     if (isConfirmed) {
       try {
         await axios.delete(`http://localhost:3001/activities/${activityId}`);
         onClose();
+        window.location.reload();
       } catch (error) {
         console.error("Error deleting activity:", error);
       }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setActivity({
+        ...activity,
+        mediaUrl: URL.createObjectURL(file),
+      });
     }
   };
 
@@ -116,16 +137,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
           <div className="flex w-full h-full">
             <input
               type="file"
-              placeholder="Media URL"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setActivity({
-                    ...activity,
-                    mediaUrl: URL.createObjectURL(file),
-                  });
-                }
-              }}
+              onChange={handleFileChange}
               className="bg-slate-400 w-2/5 h-full object-cover rounded-l-lg"
             />
             <div className="w-3/5 p-6 flex flex-col text-left justify-center">
@@ -136,7 +148,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                 onChange={(e) =>
                   setActivity({ ...activity, title: e.target.value })
                 }
-                className="text-2xl font-bold mb-5"
+                className="text-2xl font-bold mb-5 text-left"
               />
               <textarea
                 placeholder="Content"
@@ -144,7 +156,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                 onChange={(e) =>
                   setActivity({ ...activity, content: e.target.value })
                 }
-                className="mb-4"
+                className="mb-4 text-left"
               />
               <button
                 onClick={handleCreateActivity}
@@ -170,16 +182,16 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                     onChange={(e) =>
                       setActivity({ ...activity, title: e.target.value })
                     }
-                    className="text-2xl font-bold mb-4 text-left border border-gray-300 rounded p-2 w-full"
+                    className="text-2xl font-bold mb-4 border border-gray-300 rounded p-2 w-full text-left"
                   />
-                  <p className="mb-4">{activity.email}</p>
-                  <p className="mb-4">{activity.date}</p>
+                  <p className="mb-4 text-left">{activity.email}</p>
+                  <p className="mb-4 text-left">{activity.date}</p>
                   <textarea
                     value={activity.content}
                     onChange={(e) =>
                       setActivity({ ...activity, content: e.target.value })
                     }
-                    className="mb-4 text-left border border-gray-300 rounded p-2 w-full h-40"
+                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left"
                   />
                   <button
                     onClick={handleEditActivity}
