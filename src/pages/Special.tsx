@@ -22,7 +22,8 @@ const Special = () => {
   } */
 
   const  rand = async ()=>{ // 랜덤으로 문제 받아오기
-    const testarr=await axios.get("http://localhost:3001/special")
+    const accessToken  = sessionStorage.getItem('access_token')
+    const testarr=await axios.get("http://localhost:3001/special",{params: {accessToken}})
     const len:number = testarr.data.length // 안에있는 데이터의 길이
     const randomNum = Math.floor(Math.random()*len+testarr.data[0].id)
     setQuestion(testarr.data[randomNum-1].Question)
@@ -124,6 +125,11 @@ const Special = () => {
             const add_a = e.currentTarget.A.value
             console.log(add_q, add_a)
             setAdd_Modal(!add_Modal)
+            axios.post("http://localhost/3001/special",
+              {
+                Question:add_q,
+                answer:add_a
+              })
           }}
       >
           <input
