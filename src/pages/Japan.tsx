@@ -19,7 +19,8 @@ interface Japanese {
 const Japan: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [japanese, setJapanese] = useState<Japanese[]>([]);
-  const [page, setPage] = useState<number>(1);
+  const [activitiesPage, setActivitiesPage] = useState<number>(1);
+  const [japanesePage, setJapanesePage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
 
@@ -56,12 +57,21 @@ const Japan: React.FC = () => {
 
   // 페이지 변경 시 데이터 로드
   useEffect(() => {
-    fetchPaginatedActivities(page);
-    fetchPaginatedJapanese(page);
-  }, [page]);
+    fetchPaginatedActivities(activitiesPage);
+  }, [activitiesPage]);
 
-  const handlePageChange = (direction: "prev" | "next") => {
-    setPage((prevPage) =>
+  useEffect(() => {
+    fetchPaginatedJapanese(japanesePage);
+  }, [japanesePage]);
+
+  const handleActivitiesPagination = (direction: "prev" | "next") => {
+    setActivitiesPage((prevPage) =>
+      direction === "next" ? prevPage + 1 : Math.max(prevPage - 1, 1)
+    );
+  };
+
+  const handleJapanesePagination = (direction: "prev" | "next") => {
+    setJapanesePage((prevPage) =>
       direction === "next" ? prevPage + 1 : Math.max(prevPage - 1, 1)
     );
   };
@@ -97,7 +107,7 @@ const Japan: React.FC = () => {
         <div className="relative">
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            onClick={() => handlePageChange("prev")}
+            onClick={() => handleActivitiesPagination("prev")}
           >
             &lt;
           </button>
@@ -126,7 +136,7 @@ const Japan: React.FC = () => {
           </div>
           <button
             className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            onClick={() => handlePageChange("next")}
+            onClick={() => handleActivitiesPagination("next")}
           >
             &gt;
           </button>
@@ -153,7 +163,10 @@ const Japan: React.FC = () => {
         </div>
         <div className="relative">
           <div className="relative">
-            <button className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded">
+            <button
+              onClick={() => handleJapanesePagination("prev")}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+            >
               &lt;
             </button>
             <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
@@ -169,7 +182,10 @@ const Japan: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded">
+            <button
+              onClick={() => handleJapanesePagination("next")}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+            >
               &gt;
             </button>
           </div>
