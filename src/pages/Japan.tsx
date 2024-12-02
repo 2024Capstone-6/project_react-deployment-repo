@@ -8,8 +8,17 @@ interface Activity {
   mediaUrl: string;
 }
 
+interface Japanese {
+  id: number;
+  date: string;
+  email: string;
+  title: string;
+  content: string;
+}
+
 const Japan: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
+  const [japanese, setJapanese] = useState<Japanese[]>([]);
   const [page, setPage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
@@ -17,7 +26,7 @@ const Japan: React.FC = () => {
   const limit = 3;
 
   // 페이지네이션 데이터를 가져오는 함수
-  const fetchPaginatedPosts = async (page: number) => {
+  const fetchPaginatedActivities = async (page: number) => {
     try {
       const response = await axios.get(
         `http://localhost:3001/activities/page`,
@@ -30,13 +39,25 @@ const Japan: React.FC = () => {
       );
       setActivities(response.data);
     } catch (error) {
-      console.error("Error fetching paginated posts:", error);
+      console.error("Error fetching paginated activities:", error);
+    }
+  };
+
+  const fetchPaginatedJapanese = async (page: number) => {
+    try {
+      const response = await axios.get(`http://localhost:3001/japanese/page`, {
+        params: { page: page },
+      });
+      setJapanese(response.data);
+    } catch (error) {
+      console.error("Error fetching paginated japanese:", error);
     }
   };
 
   // 페이지 변경 시 데이터 로드
   useEffect(() => {
-    fetchPaginatedPosts(page);
+    fetchPaginatedActivities(page);
+    fetchPaginatedJapanese(page);
   }, [page]);
 
   const handlePageChange = (direction: "prev" | "next") => {
@@ -57,10 +78,10 @@ const Japan: React.FC = () => {
   };
 
   return (
-    <div className="japan p-5 h-screen w-full m-auto">
+    <div className="p-5 h-screen w-full m-auto">
       {/* Activities Section */}
-      <div className="activities-section mb-8">
-        <div className="search-activities flex justify-between items-center mb-4">
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
           <input
             type="text"
             placeholder="Search Activities"
@@ -73,7 +94,7 @@ const Japan: React.FC = () => {
             +
           </button>
         </div>
-        <div className="activities-container relative">
+        <div className="relative">
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
             onClick={() => handlePageChange("prev")}
@@ -120,7 +141,7 @@ const Japan: React.FC = () => {
 
       {/* Japanese Section */}
       <div className="japanese-section">
-        <div className="search-japanese flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4">
           <input
             type="text"
             placeholder="Search Japanese"
@@ -136,10 +157,17 @@ const Japan: React.FC = () => {
               &lt;
             </button>
             <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
-              <textarea
-                className="w-full h-[200px] bg-gray-200 flex-shrink-0 p-2"
-                placeholder="Large text box"
-              />
+              {japanese.map((japanese) => (
+                <div
+                  key={japanese.id}
+                  className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4"
+                >
+                  <h1 className="text-xl font-bold">{japanese.title}</h1>
+                  <p className="text-sm text-gray-500">{japanese.email}</p>
+                  <p className="text-sm text-gray-500">{japanese.date}</p>
+                  <p className="text-sm">{japanese.content}</p>
+                </div>
+              ))}
             </div>
             <button className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded">
               &gt;
