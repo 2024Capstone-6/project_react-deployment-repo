@@ -88,12 +88,26 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 
   const handleEditActivity = async () => {
     try {
+      const formData = new FormData();
+      formData.append("title", activity.title);
+      formData.append("content", activity.content);
+
+      if (selectedFile) {
+        formData.append("image", selectedFile);
+      }
+
       await axios.patch(
         `http://localhost:3001/activities/${activityId}`,
-        activity
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       setIsEditing(false);
       onClose();
+      window.location.reload();
     } catch (error) {
       console.error("Error editing activity:", error);
     }
@@ -193,6 +207,13 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                     }
                     className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left"
                   />
+                  {isEditing && (
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      className="mb-4"
+                    />
+                  )}
                   <button
                     onClick={handleEditActivity}
                     className="absolute bottom-4 right-6 bg-blue-500 text-white p-1 rounded w-20"

@@ -104,7 +104,7 @@ const Japan: React.FC = () => {
             +
           </button>
         </div>
-        <div className="relative">
+        <div className="relative h-[55vh]">
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
             onClick={() => handleActivitiesPagination("prev")}
@@ -161,34 +161,32 @@ const Japan: React.FC = () => {
             +
           </button>
         </div>
-        <div className="relative">
-          <div className="relative">
-            <button
-              onClick={() => handleJapanesePagination("prev")}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            >
-              &lt;
-            </button>
-            <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
-              {japanese.map((japanese) => (
-                <div
-                  key={japanese.id}
-                  className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4"
-                >
-                  <h1 className="text-xl font-bold">{japanese.title}</h1>
-                  <p className="text-sm text-gray-500">{japanese.email}</p>
-                  <p className="text-sm text-gray-500">{japanese.date}</p>
-                  <p className="text-sm">{japanese.content}</p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => handleJapanesePagination("next")}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            >
-              &gt;
-            </button>
+        <div className="relative  h-[20vh]">
+          <button
+            onClick={() => handleJapanesePagination("prev")}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+          >
+            &lt;
+          </button>
+          <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
+            {japanese.map((japanese) => (
+              <div
+                key={japanese.id}
+                className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4"
+              >
+                <h1 className="text-xl font-bold">{japanese.title}</h1>
+                <p className="text-sm text-gray-500">{japanese.email}</p>
+                <p className="text-sm text-gray-500">{japanese.date}</p>
+                <p className="text-sm">{japanese.content}</p>
+              </div>
+            ))}
           </div>
+          <button
+            onClick={() => handleJapanesePagination("next")}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+          >
+            &gt;
+          </button>
         </div>
       </div>
     </div>
