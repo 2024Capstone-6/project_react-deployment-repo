@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import './board.css'; // CSS 파일 임포트
+import '../../style/board.css'; // CSS 파일 임포트
 
 // 게시글 데이터 타입 정의
 interface Board {
    title: string;
    content: string;
    imgurl?: string;
+   date: string;
 }
 
 interface Chat {
    id: number;
    content: string;
    imgurl?: string;
+   date: string;
 }
 
 const BoardIN: React.FC = () => {
@@ -116,6 +118,7 @@ const BoardIN: React.FC = () => {
          <div className="board-title">
             {board.content} {/* 게시글 내용 */}
          </div>
+         <p>작성시간: {board.date}</p>
          {board.imgurl && (
             <img src={board.imgurl} alt="게시글 이미지" className="board-image" />
          )}
@@ -156,6 +159,7 @@ const BoardIN: React.FC = () => {
                   ) : (
                      <>
                         <p>{chat.content}</p>
+                        <p>작성시간: {chat.date}</p>
                         {chat.imgurl && <img src={chat.imgurl} alt="댓글 이미지" style={{ width: "100%" }} />}
                         <button onClick={() => { 
                            setEditingChatId(chat.id); 

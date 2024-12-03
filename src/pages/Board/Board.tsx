@@ -8,6 +8,7 @@ interface Board {
   title: string;
   content: string;
   imgurl?: string;
+  date: string;
 }
 
 const BoardPage: React.FC = () => {
@@ -81,9 +82,6 @@ const BoardPage: React.FC = () => {
     <>
       <div className="mainpage">
         <h1>영딧게시판</h1>
-        <div className="createBoard" onClick={() => navigate('/createBoard')}>
-          글쓰기
-        </div>
         <div className="boardbox">
           {board.length === 0 ? (
             <p>게시글이 없습니다.</p> // 게시글이 없을 때 메시지 표시
@@ -92,12 +90,16 @@ const BoardPage: React.FC = () => {
               <div key={item.id} className="boardlist" onClick={() => navigate(`${item.id}`)}>
                 <h2>제목: {item.title}</h2>
                 <p>내용: {item.content}</p>
+                <p>작성시간: {item.date}</p>
                 {item.imgurl && (
                 <img src={item.imgurl} alt="게시글 이미지" style={{ width: "100px", height: "auto", marginTop: "10px" }} />
               )}
               </div>
             ))
           )}
+        </div>
+        <div className="createBoard" onClick={() => navigate('/createBoard')}>
+          글쓰기
         </div>
 
         {/* 페이지네이션 */}

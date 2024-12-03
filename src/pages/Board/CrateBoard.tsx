@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import './board.css'; // CSS 파일 임포트
+import '../../style/board.css'; // CSS 파일 임포트
 
 // 게시글 데이터 타입 정의
 interface Board {
