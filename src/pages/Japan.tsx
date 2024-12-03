@@ -23,8 +23,46 @@ const Japan: React.FC = () => {
   const [japanesePage, setJapanesePage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
+  const [userEmail, setUserEmail] = useState<string>("");
 
   const limit = 3;
+
+  // 활동 목록을 새로고침하는 함수
+  const refreshActivities = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/activities/page`,
+        {
+          params: {
+            page: activitiesPage,
+            limit: limit,
+          },
+        }
+      );
+      setActivities(response.data);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 세션스토리지에서 유저 정보 가져오기
+  useEffect(() => {
+    const email = sessionStorage.getItem("Email");
+    if (!email) {
+      window.location.href = "/login";
+      return;
+    }
+    setUserEmail(email);
+  }, []);
+
+  const handleCreateActivity = () => {
+    if (!userEmail) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    setSelectedID(null);
+    setIsModalOpen(true);
+  };
 
   // 페이지네이션 데이터를 가져오는 함수
   const fetchPaginatedActivities = async (page: number) => {
@@ -79,11 +117,6 @@ const Japan: React.FC = () => {
   const handleActivityClick = (id: number) => {
     console.log(`Card ${id} clicked`);
     setSelectedID(id);
-    setIsModalOpen(true);
-  };
-
-  const handleCreateActivity = () => {
-    setSelectedID(null);
     setIsModalOpen(true);
   };
 
@@ -143,8 +176,13 @@ const Japan: React.FC = () => {
           {/* 모달 컴포넌트 추가 */}
           <ActivitiesModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
+            onClose={() => {
+              setIsModalOpen(false);
+              refreshActivities(); // 모달이 닫힐 때 활동 목록 새로고침
+            }}
             activityId={selcetedID}
+            userEmail={userEmail}
+            refreshActivities={refreshActivities} // 새로운 prop 추가
           />
         </div>
       </div>

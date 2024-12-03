@@ -1,13 +1,12 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
   const routes = [
-    { path: '/member', label: 'Member' },
-    { path: '/login', label: 'Login' },
-    { path: '/japan', label: 'Japan' },
-    { path: '/board', label: 'Board' },
-    { path: '/special', label: 'Special'},
+    { path: "/member", label: "Member" },
+    { path: "/japan", label: "Japan" },
+    { path: "/board", label: "Board" },
+    { path: "/special", label: "Special" },
   ];
 
   return (
@@ -19,7 +18,9 @@ export default function Navbar() {
               <Link
                 to={route.path}
                 className={`flex items-center p-2 rounded ${
-                  location.pathname === route.path ? 'bg-blue-200' : 'text-gray-700 hover:bg-gray-200'
+                  location.pathname === route.path
+                    ? "bg-blue-200"
+                    : "text-gray-700 hover:bg-gray-200"
                 } no-underline`}
               >
                 <span className="ml-2">{route.label}</span>

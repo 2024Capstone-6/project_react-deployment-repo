@@ -5,6 +5,8 @@ interface ActivitiesModalProps {
   isOpen: boolean;
   onClose: () => void;
   activityId: number | null;
+  userEmail: string;
+  refreshActivities: () => Promise<void>;
 }
 
 interface Activity {
@@ -29,6 +31,8 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   isOpen,
   onClose,
   activityId,
+  userEmail,
+  refreshActivities,
 }) => {
   const [activity, setActivity] = useState<Activity>(defaultActivity);
   const [isEditing, setIsEditing] = useState(false);
@@ -64,7 +68,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
         const formattedDate = today.toISOString().split("T")[0];
 
         const formData = new FormData();
-        formData.append("email", activity.email);
+        formData.append("email", userEmail);
         formData.append("date", formattedDate);
         formData.append("title", activity.title);
         formData.append("content", activity.content);
@@ -72,14 +76,13 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
         if (selectedFile) {
           formData.append("image", selectedFile);
         }
-
         await axios.post(`http://localhost:3001/activities`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
+        await refreshActivities();
         onClose();
-        window.location.reload();
       } catch (error) {
         console.error("Error creating activity:", error);
       }
@@ -95,7 +98,6 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       if (selectedFile) {
         formData.append("image", selectedFile);
       }
-
       await axios.patch(
         `http://localhost:3001/activities/${activityId}`,
         formData,
@@ -105,9 +107,9 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
           },
         }
       );
+      await refreshActivities();
       setIsEditing(false);
       onClose();
-      window.location.reload();
     } catch (error) {
       console.error("Error editing activity:", error);
     }
@@ -119,8 +121,8 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     if (isConfirmed) {
       try {
         await axios.delete(`http://localhost:3001/activities/${activityId}`);
+        await refreshActivities();
         onClose();
-        window.location.reload();
       } catch (error) {
         console.error("Error deleting activity:", error);
       }
@@ -136,6 +138,10 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
         mediaUrl: URL.createObjectURL(file),
       });
     }
+  };
+
+  const isOwner = () => {
+    return activity?.email === userEmail;
   };
 
   return (
@@ -182,7 +188,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
             </div>
           </div>
         ) : activity ? (
-          // 게시물 수정
+          // 게시물 수정/조회
           <div className="flex w-full h-full">
             <img
               src={activity.mediaUrl}
@@ -216,12 +222,14 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                       className="mb-4"
                     />
                   )}
-                  <button
-                    onClick={handleEditActivity}
-                    className="absolute bottom-4 right-6 bg-blue-500 text-white p-1 rounded w-20"
-                  >
-                    Save
-                  </button>
+                  {isOwner() && (
+                    <button
+                      onClick={handleEditActivity}
+                      className="absolute bottom-4 right-6 bg-blue-500 text-white p-1 rounded w-20"
+                    >
+                      Save
+                    </button>
+                  )}
                 </>
               ) : (
                 // 게시물 상세보기
@@ -230,18 +238,22 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                   <p className="mb-4">{activity.email}</p>
                   <p className="mb-4">{activity.date}</p>
                   <p className="mb-4">{activity.content}</p>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="absolute bottom-4 right-20 border border-blue-500 text-blue-500 p-1 rounded"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={handleDeleteActivity}
-                    className="absolute bottom-4 right-5 border border-red-500 text-red-500 p-1 rounded"
-                  >
-                    Delete
-                  </button>
+                  {isOwner() && (
+                    <div className="absolute bottom-4 right-4 space-x-2">
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="border border-blue-500 text-blue-500 p-1 rounded"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={handleDeleteActivity}
+                        className="border border-red-500 text-red-500 p-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>
