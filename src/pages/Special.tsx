@@ -10,6 +10,7 @@ const Special = () => {
   const [uid,setUid] = useState('')
   useEffect(()=>{
     rand() 
+    sessionStorage.setItem('access_token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWNrbmFtZSI6IuqwleuvvOykgCIsImlhdCI6MTUxNjIzOTAyMn0.DWdnhhfTSY2FKPxIIRN433kQSHwl7HDnUM2elr1IrD0')
   },[])
 
 /*   const add_Question = () =>{
@@ -21,16 +22,17 @@ const Special = () => {
     
   } */
 
-  const  rand = async ()=>{ // 랜덤으로 문제 받아오기
+  const rand = async ()=>{ // 랜덤으로 문제 받아오기
     const accessToken  = sessionStorage.getItem('access_token')
-    const testarr=await axios.get("http://localhost:3001/special",{params: {accessToken}})
-    const len:number = testarr.data.length // 안에있는 데이터의 길이
-    const randomNum = Math.floor(Math.random()*len+testarr.data[0].id)
-    setQuestion(testarr.data[randomNum-1].Question)
-    setAnswer(testarr.data[randomNum-1].answer)
-    setUid(//testarr.data[randomNum-1].uid
-      ''
-      )
+    console.log(accessToken)
+    const testarr = await axios.get("http://localhost:3001/special",{headers:{Authorization:`Bearer ${accessToken}`}})
+    const len:number = await testarr.data.length // 안에있는 데이터의 길이
+    const randomNum = Math.floor(Math.random()*len)
+    console.log(testarr.data)
+    console.log(randomNum)
+    setQuestion(testarr.data[randomNum].Question)
+    setAnswer(testarr.data[randomNum].answer)
+    // setUid(testarr.data[randomNum-1].uid)
   }
 
   const checkAnswer = (c:any)=>{
@@ -107,6 +109,10 @@ const Special = () => {
         </form>
         
       </div>
+
+
+
+      {/* 모달창 */}
       {add_Modal ?     
       <div
         className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
