@@ -2,59 +2,82 @@ import { setId } from '@material-tailwind/react/components/Tabs/TabsContext'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { children } from 'solid-js'
+import Add_Modal from '../components/Add_Modal'
+import Delete_Modal from '../components/Delete_Modal'
+import Update_Modal from '../components/Update_Modal'
+import Fail_Modal_Screen from '../components/Fail_Modal'
+import Ok_Modal_Screen from '../components/Ok_Modal'
 
 const Special = () => {
   const [add_Modal,setAdd_Modal] = useState(false)
+  const [up_Modal,setUp_Modal] = useState(false)
+  const [delete_Modal,setDeleteModal] = useState(false)
+  const [Ok_Modal,setOk_Modal]=useState(false)
+  const [Fail_Modal,setFail_Modal] = useState(false)
   const [Question,setQuestion] = useState('')
+  const [id,setId] = useState('')
   const [answer,setAnswer] = useState('')
-  const [uid,setUid] = useState('')
+  const [author,setAuthor] = useState('')
+  const [accessor,setAccesor ] = useState('')
+  const [toggle,setToggle ] = useState(true)
+
   useEffect(()=>{
     rand() 
-    sessionStorage.setItem('access_token','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuaWNrbmFtZSI6IuqwleuvvOykgCIsImlhdCI6MTUxNjIzOTAyMn0.DWdnhhfTSY2FKPxIIRN433kQSHwl7HDnUM2elr1IrD0')
-  },[])
-
-/*   const add_Question = () =>{
-    const auth = axios.get("http://localhost:3001/special/auth")
-    axios.post("http://localhost:3001/",
-      {
-        Qusetin :'' ,
-      })
-    
-  } */
+  },[toggle])
 
   const rand = async ()=>{ // 랜덤으로 문제 받아오기
     const accessToken  = sessionStorage.getItem('access_token')
-    console.log(accessToken)
-    const testarr = await axios.get("http://localhost:3001/special",{headers:{Authorization:`Bearer ${accessToken}`}})
+    const testarr = await axios.get('http://localhost:3001/special')
+    const accessor = (await axios.get("http://localhost:3001/special/gettoken",{headers:{access_token:`${accessToken}`}})).data.nickname
     const len:number = await testarr.data.length // 안에있는 데이터의 길이
     const randomNum = Math.floor(Math.random()*len)
-    console.log(testarr.data)
-    console.log(randomNum)
     setQuestion(testarr.data[randomNum].Question)
     setAnswer(testarr.data[randomNum].answer)
-    // setUid(testarr.data[randomNum-1].uid)
+    setAuthor(testarr.data[randomNum].author)
+    setId(testarr.data[randomNum].id)
+    setAccesor(accessor)
+
   }
 
+  
   const checkAnswer = (c:any)=>{
     if(answer===c){
-      console.log('정답.')
+      setOkModal()
     }
     else{
-      console.log(`틀림 ${c} 병신아`)
+      setFailModal()
     }
   }
+  
+  const settoggle = () =>{
+    setToggle(!toggle)
+  }
 
+  const addModal = ()=>{
+    return setAdd_Modal(!add_Modal)
+  }
+
+  const updateModal=()=>{
+    return setUp_Modal(!up_Modal)
+  }
+
+  const delModal=()=>{
+    return setDeleteModal(!delete_Modal)
+  }
+  
+  const setOkModal=()=>{
+    return setOk_Modal(!Ok_Modal)
+  }
+  
+  const setFailModal=()=>{
+    return setFail_Modal(!Fail_Modal)
+  }
+
+  
   return (
-/*     <div>
-      <div className='Question'>
-        <div style={{alignContent:'center'}}>{Question}</div>
-        <button>수정</button>
-      </div>
-      <button onClick={test}>test</button>
-    </div> */
+
 
     <div className="flex h-[80vh]">
-      {/* Sidebar */}
       <div className="w-48 bg-gray-800 text-white flex flex-col items-center justify-start pt-8 font-bold text-lg">
         일본어 퀴즈
       </div>
@@ -73,13 +96,15 @@ const Special = () => {
             {Question}
           </p>
           
-          { uid == '' ?
+          {accessor  == author ?
           /* 오른쪽 하단의 파란색과 빨간색 버튼 */
           <div className="absolute bottom-4 right-4 flex space-x-4">
             <button
+              onClick={()=>{updateModal()}}
               className="w-[72px] h-[40.5px] bg-blue-500 rounded-md "
             > 수정 </button>
             <button
+              onClick={()=>{delModal()}}
               className="w-[72px] h-[40.5px] bg-red-500 rounded-md "
               aria-label="빨간 버튼"
             >삭제</button>
@@ -91,6 +116,7 @@ const Special = () => {
             e.preventDefault()
             const answer = e.currentTarget.answer.value // input창의 값 읽어옴.
             checkAnswer(answer)
+            e.currentTarget.answer.value = ''
           }}
           className="w-[90%] space-y-4"
         >
@@ -112,63 +138,26 @@ const Special = () => {
 
 
 
-      {/* 모달창 */}
-      {add_Modal ?     
-      <div
-        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-        onClick={()=>{setAdd_Modal(!add_Modal)}}
-      >
-      <div
-        className="bg-white p-8 rounded-lg shadow-lg w-[1000px] h-auto max-w-full"
-        onClick={(e) => e.stopPropagation()} // 모달 내부 클릭 시 닫히지 않도록 설정
-      >
-      <h3 className="text-2xl font-bold mb-6">문제 작성</h3>
-      <form
-        onSubmit={
-          (e)=>{
-            e.preventDefault()
-            const add_q = e.currentTarget.Q.value
-            const add_a = e.currentTarget.A.value
-            console.log(add_q, add_a)
-            setAdd_Modal(!add_Modal)
-            axios.post("http://localhost/3001/special",
-              {
-                Question:add_q,
-                answer:add_a
-              })
-          }}
-      >
-          <input
-            type="text"
-            className="w-full p-3 border rounded mb-6"
-            placeholder="문제를 입력하세요" 
-            name='Q'
-          />
-
-          <h3 className="text-2xl font-bold mb-6">답 작성</h3>
-          <input
-            type="text"
-            className="w-full p-3 border rounded mb-6"
-            placeholder="답을 입력하세요"
-            name='A'
-          />
-
-          <button
-            className="w-full bg-green-500 text-white py-3 rounded mb-4 hover:bg-green-600 transition"
-            type='submit'
-          >
-            업로드
-          </button>
-        </form>
-        <button
-          className="w-full bg-red-500 text-white py-3 rounded hover:bg-red-600 transition"
-          onClick={()=>{setAdd_Modal(!add_Modal)}}
-        >
-          닫기
-        </button>
-      </div>
-    </div>
+      {/* 추가 모달창 */}
+      {add_Modal ? 
+        <Add_Modal setModal={addModal} accessor={accessor}/>
         :''}
+      {/* 업데이트 모달창 */}
+      {up_Modal ? 
+      <Update_Modal answer={answer} question={Question} setModal={updateModal} settoggle={settoggle} accessor={accessor} qid={id}/>
+      :''}
+      {/* 삭제 모달창 */}
+      {delete_Modal ? 
+      <Delete_Modal setModal={delModal} settoggle={settoggle} qid={id}/>
+      :''}
+      {/* 성공 모달창 */}
+      {Ok_Modal ? 
+      <Ok_Modal_Screen setModal={setOkModal} settoggle={settoggle} qid={id}/>
+      :''}
+      {/* 실패 모달창 */}
+      {Fail_Modal ? 
+        <Fail_Modal_Screen setModal={setFailModal} settoggle={settoggle} qid={id}/>
+      :''}
     </div>
 
   )
