@@ -148,6 +148,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
           &times;
         </button>
         {activityId === null ? (
+          // 게시물 생성
           <div className="flex w-full h-full">
             <input
               type="file"
@@ -181,6 +182,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
             </div>
           </div>
         ) : activity ? (
+          // 게시물 수정
           <div className="flex w-full h-full">
             <img
               src={activity.mediaUrl}
@@ -222,8 +224,11 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                   </button>
                 </>
               ) : (
+                // 게시물 상세보기
                 <>
                   <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
+                  <p className="mb-4">{activity.email}</p>
+                  <p className="mb-4">{activity.date}</p>
                   <p className="mb-4">{activity.content}</p>
                   <button
                     onClick={() => setIsEditing(true)}
