@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 import ActivitiesModal from "../components/ActivitiesModal";
+import JapaneseModal from "../components/JapaneseModal";
 
 interface Activity {
   id: number;
@@ -24,6 +25,11 @@ const Japan: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selcetedID, setSelectedID] = useState<number | null>(null);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [selectedJapaneseId, setSelectedJapaneseId] = useState<number | null>(
+    null
+  );
+  const [isJapaneseModalOpen, setIsJapaneseModalOpen] =
+    useState<boolean>(false);
 
   const limit = 3;
 
@@ -120,6 +126,35 @@ const Japan: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Japanese 목록을 새로고침하는 함수
+  const refreshJapanese = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3001/japanese/page`, {
+        params: {
+          page: japanesePage,
+        },
+      });
+      setJapanese(response.data);
+    } catch (error) {
+      console.error("Error fetching japanese:", error);
+    }
+  };
+
+  const handleCreateJapanese = () => {
+    if (!userEmail) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    setSelectedJapaneseId(null);
+    setIsJapaneseModalOpen(true);
+  };
+
+  const handleJapaneseClick = (id: number) => {
+    console.log(`Japanese ${id} clicked`);
+    setSelectedJapaneseId(id);
+    setIsJapaneseModalOpen(true);
+  };
+
   return (
     <div className="p-5 h-screen w-full m-auto">
       {/* Activities Section */}
@@ -195,11 +230,14 @@ const Japan: React.FC = () => {
             placeholder="Search Japanese"
             className="border p-2 rounded w-full mb-4"
           />
-          <button className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4">
+          <button
+            className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4"
+            onClick={handleCreateJapanese}
+          >
             +
           </button>
         </div>
-        <div className="relative  h-[20vh]">
+        <div className="relative h-[20vh]">
           <button
             onClick={() => handleJapanesePagination("prev")}
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
@@ -210,7 +248,8 @@ const Japan: React.FC = () => {
             {japanese.map((japanese) => (
               <div
                 key={japanese.id}
-                className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4"
+                className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4 cursor-pointer"
+                onClick={() => handleJapaneseClick(japanese.id)}
               >
                 <h1 className="text-xl font-bold">{japanese.title}</h1>
                 <p className="text-sm text-gray-500">{japanese.email}</p>
@@ -226,6 +265,17 @@ const Japan: React.FC = () => {
             &gt;
           </button>
         </div>
+        {/* Japanese 모달 컴포넌트 추가 */}
+        <JapaneseModal
+          isOpen={isJapaneseModalOpen}
+          onClose={() => {
+            setIsJapaneseModalOpen(false);
+            refreshJapanese();
+          }}
+          japaneseId={selectedJapaneseId}
+          userEmail={userEmail}
+          refreshJapanese={refreshJapanese}
+        />
       </div>
     </div>
   );
