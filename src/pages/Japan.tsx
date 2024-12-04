@@ -28,6 +28,8 @@ const Japan: React.FC = () => {
   const [selectedJapaneseId, setSelectedJapaneseId] = useState<number | null>(
     null
   );
+  const [totalActivities, setTotalActivities] = useState<number>(0);
+  const [totalJapanese, setTotalJapanese] = useState<number>(0);
   const [isJapaneseModalOpen, setIsJapaneseModalOpen] =
     useState<boolean>(false);
 
@@ -45,7 +47,8 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setActivities(response.data);
+      setActivities(response.data.items);
+      setTotalActivities(response.data.total);
     } catch (error) {
       console.error("Error fetching activities:", error);
     }
@@ -82,7 +85,8 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setActivities(response.data);
+      setActivities(response.data.items);
+      setTotalActivities(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated activities:", error);
     }
@@ -93,7 +97,8 @@ const Japan: React.FC = () => {
       const response = await axios.get(`http://localhost:3001/japanese/page`, {
         params: { page: page },
       });
-      setJapanese(response.data);
+      setJapanese(response.data.items);
+      setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated japanese:", error);
     }
@@ -109,15 +114,25 @@ const Japan: React.FC = () => {
   }, [japanesePage]);
 
   const handleActivitiesPagination = (direction: "prev" | "next") => {
-    setActivitiesPage((prevPage) =>
-      direction === "next" ? prevPage + 1 : Math.max(prevPage - 1, 1)
-    );
+    if (direction === "next") {
+      const nextPage = activitiesPage + 1;
+      if ((nextPage - 1) * limit < totalActivities) {
+        setActivitiesPage(nextPage);
+      }
+    } else {
+      setActivitiesPage((prevPage) => Math.max(prevPage - 1, 1));
+    }
   };
 
   const handleJapanesePagination = (direction: "prev" | "next") => {
-    setJapanesePage((prevPage) =>
-      direction === "next" ? prevPage + 1 : Math.max(prevPage - 1, 1)
-    );
+    if (direction === "next") {
+      const nextPage = japanesePage + 1;
+      if (nextPage - 1 < totalJapanese) {
+        setJapanesePage(nextPage);
+      }
+    } else {
+      setJapanesePage((prevPage) => Math.max(prevPage - 1, 1));
+    }
   };
 
   const handleActivityClick = (id: number) => {
@@ -134,7 +149,8 @@ const Japan: React.FC = () => {
           page: japanesePage,
         },
       });
-      setJapanese(response.data);
+      setJapanese(response.data.items);
+      setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching japanese:", error);
     }
@@ -203,8 +219,11 @@ const Japan: React.FC = () => {
             ))}
           </div>
           <button
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+            className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
+              activitiesPage * limit >= totalActivities ? "text-gray-300" : ""
+            }`}
             onClick={() => handleActivitiesPagination("next")}
+            disabled={activitiesPage * limit >= totalActivities}
           >
             &gt;
           </button>
@@ -261,8 +280,11 @@ const Japan: React.FC = () => {
             ))}
           </div>
           <button
+            className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
+              japanesePage >= totalJapanese ? "text-gray-300" : ""
+            }`}
             onClick={() => handleJapanesePagination("next")}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+            disabled={japanesePage >= totalJapanese}
           >
             &gt;
           </button>
