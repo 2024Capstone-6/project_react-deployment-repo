@@ -177,7 +177,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                 onChange={(e) =>
                   setActivity({ ...activity, content: e.target.value })
                 }
-                className="mb-4 text-left"
+                className="mb-4 text-left w-full h-40 p-2 border rounded whitespace-pre-wrap"
               />
               <button
                 onClick={handleCreateActivity}
@@ -213,7 +213,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                     onChange={(e) =>
                       setActivity({ ...activity, content: e.target.value })
                     }
-                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left"
+                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left whitespace-pre-wrap"
                   />
                   {isEditing && (
                     <input
@@ -237,7 +237,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                   <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
                   <p className="mb-4">{activity.email}</p>
                   <p className="mb-4">{activity.date}</p>
-                  <p className="mb-4">{activity.content}</p>
+                  <p className="mb-4 whitespace-pre-wrap">{activity.content}</p>
                   {isOwner() && (
                     <div className="absolute bottom-4 right-4 space-x-2">
                       <button

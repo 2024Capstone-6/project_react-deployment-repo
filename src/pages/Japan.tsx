@@ -254,7 +254,9 @@ const Japan: React.FC = () => {
                 <h1 className="text-xl font-bold">{japanese.title}</h1>
                 <p className="text-sm text-gray-500">{japanese.email}</p>
                 <p className="text-sm text-gray-500">{japanese.date}</p>
-                <p className="text-sm">{japanese.content}</p>
+                <p className="text-sm whitespace-pre-wrap overflow-hidden">
+                  {japanese.content}
+                </p>
               </div>
             ))}
           </div>

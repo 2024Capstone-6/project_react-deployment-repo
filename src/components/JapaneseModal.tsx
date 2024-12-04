@@ -145,7 +145,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
                 onChange={(e) =>
                   setJapanese({ ...japanese, content: e.target.value })
                 }
-                className="mb-4 text-left"
+                className="mb-4 text-left w-full h-40 p-2 border rounded whitespace-pre-wrap"
               />
               <button
                 onClick={handleCreateJapanese}
@@ -176,7 +176,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
                     onChange={(e) =>
                       setJapanese({ ...japanese, content: e.target.value })
                     }
-                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left"
+                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left whitespace-pre-wrap"
                   />
                   {isOwner() && (
                     <button
@@ -193,7 +193,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
                   <h2 className="text-3xl font-bold mb-5">{japanese.title}</h2>
                   <p className="mb-4">{japanese.email}</p>
                   <p className="mb-4">{japanese.date}</p>
-                  <p className="mb-4">{japanese.content}</p>
+                  <p className="mb-4 whitespace-pre-wrap">{japanese.content}</p>
                   {isOwner() && (
                     <div className="absolute bottom-4 right-4 space-x-2">
                       <button
