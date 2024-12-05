@@ -159,7 +159,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
             <input
               type="file"
               onChange={handleFileChange}
-              className="bg-slate-400 w-2/5 h-full object-cover rounded-l-lg"
+              className="bg-slate-300 w-2/5 h-full object-cover rounded-l-lg"
             />
             <div className="w-3/5 p-6 flex flex-col text-left justify-center">
               <input
@@ -204,10 +204,14 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
                     onChange={(e) =>
                       setActivity({ ...activity, title: e.target.value })
                     }
-                    className="text-2xl font-bold mb-4 border border-gray-300 rounded p-2 w-full text-left"
+                    className="text-2xl font-bold mb-4 w-full text-left"
                   />
-                  <p className="mb-4 text-left">{activity.email}</p>
-                  <p className="mb-4 text-left">{activity.date}</p>
+                  <p className="text-sm text-gray-500 text-left">
+                    {activity.email}
+                  </p>
+                  <p className="mb-4 text-sm text-gray-500 text-left">
+                    {activity.date}
+                  </p>
                   <textarea
                     value={activity.content}
                     onChange={(e) =>
@@ -234,9 +238,9 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
               ) : (
                 // 게시물 상세보기
                 <>
-                  <h2 className="text-3xl font-bold mb-5">{activity.title}</h2>
-                  <p className="mb-4">{activity.email}</p>
-                  <p className="mb-4">{activity.date}</p>
+                  <h2 className="text-2xl font-bold mb-5">{activity.title}</h2>
+                  <p className="text-sm text-gray-500">{activity.email}</p>
+                  <p className="text-sm text-gray-500 mb-4">{activity.date}</p>
                   <p className="mb-4 whitespace-pre-wrap">{activity.content}</p>
                   {isOwner() && (
                     <div className="absolute bottom-4 right-4 space-x-2">

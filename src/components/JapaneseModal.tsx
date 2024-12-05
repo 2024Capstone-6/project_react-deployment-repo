@@ -119,7 +119,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex z-50">
-      <div className="bg-white m-auto p-6 w-[80vw] h-[80vh] rounded-lg shadow-lg relative">
+      <div className="bg-white m-auto p-6 w-[80vw] h-[50vh] rounded-lg shadow-lg relative">
         <button
           className="absolute top-2 right-4 text-gray-500 hover:text-gray-700"
           onClick={onClose}
@@ -128,8 +128,8 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
         </button>
         {japaneseId === null ? (
           // 게시물 생성
-          <div className="flex w-full h-full">
-            <div className="w-full p-6 flex flex-col text-left justify-center">
+          <div className="flex w-full h-full items-center justify-center">
+            <div className="w-3/5 flex flex-col text-left">
               <input
                 type="text"
                 placeholder="Title"
@@ -137,15 +137,19 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
                 onChange={(e) =>
                   setJapanese({ ...japanese, title: e.target.value })
                 }
-                className="text-2xl font-bold mb-5 text-left"
+                className="text-3xl font-bold mb-4 text-left"
               />
+              <p className="text-sm text-gray-500">{userEmail}</p>
+              <p className="text-sm text-gray-500 mb-4">
+                {new Date().toISOString().split("T")[0]}
+              </p>
               <textarea
                 placeholder="Content"
                 value={japanese?.content || ""}
                 onChange={(e) =>
                   setJapanese({ ...japanese, content: e.target.value })
                 }
-                className="mb-4 text-left w-full h-40 p-2 border rounded whitespace-pre-wrap"
+                className="mb-4 text-left border border-gray-300 rounded p-2 w-full h-[25vh] whitespace-pre-wrap"
               />
               <button
                 onClick={handleCreateJapanese}
@@ -157,8 +161,8 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
           </div>
         ) : japanese ? (
           // 게시물 수정/조회
-          <div className="flex w-full h-full">
-            <div className="w-full p-6 flex flex-col text-left justify-center">
+          <div className="flex w-full h-full items-center justify-center">
+            <div className="w-1/2 flex flex-col text-left">
               {isEditing ? (
                 <>
                   <input
@@ -167,16 +171,16 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
                     onChange={(e) =>
                       setJapanese({ ...japanese, title: e.target.value })
                     }
-                    className="text-2xl font-bold mb-4 border border-gray-300 rounded p-2 w-full text-left"
+                    className="text-3xl font-bold mb-4 w-full text-left"
                   />
-                  <p className="mb-4 text-left">{japanese.email}</p>
-                  <p className="mb-4 text-left">{japanese.date}</p>
+                  <p className="text-sm text-gray-500">{japanese.email}</p>
+                  <p className="text-sm text-gray-500 mb-4">{japanese.date}</p>
                   <textarea
                     value={japanese.content}
                     onChange={(e) =>
                       setJapanese({ ...japanese, content: e.target.value })
                     }
-                    className="mb-4 border border-gray-300 rounded p-2 w-full h-40 text-left whitespace-pre-wrap"
+                    className="mb-4 border border-gray-300 rounded p-2 w-full h-[25vh] text-left whitespace-pre-wrap"
                   />
                   {isOwner() && (
                     <button
@@ -190,10 +194,12 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
               ) : (
                 // 게시물 상세보기
                 <>
-                  <h2 className="text-3xl font-bold mb-5">{japanese.title}</h2>
-                  <p className="mb-4">{japanese.email}</p>
-                  <p className="mb-4">{japanese.date}</p>
-                  <p className="mb-4 whitespace-pre-wrap">{japanese.content}</p>
+                  <h2 className="text-3xl font-bold mb-4">{japanese.title}</h2>
+                  <p className="text-sm text-gray-500">{japanese.email}</p>
+                  <p className="text-sm text-gray-500 mb-4">{japanese.date}</p>
+                  <p className="mb-4 border border-gray-300 rounded p-2 h-[25vh] overflow-y-auto whitespace-pre-wrap">
+                    {japanese.content}
+                  </p>
                   {isOwner() && (
                     <div className="absolute bottom-4 right-4 space-x-2">
                       <button
