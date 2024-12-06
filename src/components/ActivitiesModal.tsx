@@ -3,7 +3,7 @@ import axios from "axios";
 
 interface ActivitiesModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (isNewItem: boolean) => void;
   activityId: number | null;
   userEmail: string;
   refreshActivities: () => Promise<void>;
@@ -46,6 +46,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
             `http://localhost:3001/activities/${activityId}`
           );
           setActivity(response.data);
+          setSelectedFile(null);
         } catch (error) {
           console.error("Error fetching activity:", error);
         }
@@ -54,6 +55,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       fetchActivity();
     } else {
       setActivity(defaultActivity);
+      setSelectedFile(null);
     }
   }, [activityId]);
 
@@ -82,7 +84,9 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
           },
         });
         await refreshActivities();
-        onClose();
+        setActivity(defaultActivity);
+        setSelectedFile(null);
+        onClose(true);
       } catch (error) {
         console.error("Error creating activity:", error);
       }
@@ -109,7 +113,8 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       );
       await refreshActivities();
       setIsEditing(false);
-      onClose();
+      setSelectedFile(null);
+      onClose(false);
     } catch (error) {
       console.error("Error editing activity:", error);
     }
@@ -122,7 +127,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       try {
         await axios.delete(`http://localhost:3001/activities/${activityId}`);
         await refreshActivities();
-        onClose();
+        onClose(false);
       } catch (error) {
         console.error("Error deleting activity:", error);
       }
@@ -149,7 +154,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       <div className="bg-white m-auto p-6 w-[80vw] h-[80vh] rounded-lg shadow-lg relative">
         <button
           className="absolute top-2 right-4 text-gray-500 hover:text-gray-700"
-          onClick={onClose}
+          onClick={() => onClose(false)}
         >
           &times;
         </button>

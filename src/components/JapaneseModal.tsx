@@ -3,7 +3,7 @@ import axios from "axios";
 
 interface JapaneseModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (isNewItem: boolean) => void;
   japaneseId: number | null;
   userEmail: string;
   refreshJapanese: () => Promise<void>;
@@ -72,8 +72,8 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
         };
 
         await axios.post(`http://localhost:3001/japanese`, newJapanese);
-        await refreshJapanese();
-        onClose();
+        setJapanese(defaultJapanese);
+        onClose(true);
       } catch (error) {
         console.error("Error creating japanese:", error);
       }
@@ -93,7 +93,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       );
       await refreshJapanese();
       setIsEditing(false);
-      onClose();
+      onClose(false);
     } catch (error) {
       console.error("Error editing japanese:", error);
     }
@@ -106,7 +106,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       try {
         await axios.delete(`http://localhost:3001/japanese/${japaneseId}`);
         await refreshJapanese();
-        onClose();
+        onClose(false);
       } catch (error) {
         console.error("Error deleting japanese:", error);
       }
@@ -122,7 +122,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       <div className="bg-white m-auto p-6 w-[80vw] h-[50vh] rounded-lg shadow-lg relative">
         <button
           className="absolute top-2 right-4 text-gray-500 hover:text-gray-700"
-          onClick={onClose}
+          onClick={() => onClose(false)}
         >
           &times;
         </button>

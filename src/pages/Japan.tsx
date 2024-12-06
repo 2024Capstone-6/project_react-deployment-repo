@@ -4,22 +4,37 @@ import axios from "axios";
 import ActivitiesModal from "../components/ActivitiesModal";
 import JapaneseModal from "../components/JapaneseModal";
 
-interface Activity {
+interface ContentItem {
   id: number;
-  mediaUrl: string;
+  email: string;
+  date: string;
+  title?: string;
+  content?: string;
+  mediaUrl?: string;
 }
 
-interface Japanese {
-  id: number;
-  date: string;
-  email: string;
-  title: string;
-  content: string;
-}
+const SearchCreateSection: React.FC<{
+  placeholder: string;
+  onCreate: () => void;
+}> = ({ placeholder, onCreate }) => (
+  <div className="flex justify-between items-center mb-4">
+    <input
+      type="text"
+      placeholder={placeholder}
+      className="border p-2 rounded w-full mb-4"
+    />
+    <button
+      className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4"
+      onClick={onCreate}
+    >
+      +
+    </button>
+  </div>
+);
 
 const Japan: React.FC = () => {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [japanese, setJapanese] = useState<Japanese[]>([]);
+  const [activities, setActivities] = useState<ContentItem[]>([]);
+  const [japanese, setJapanese] = useState<ContentItem[]>([]);
   const [activitiesPage, setActivitiesPage] = useState<number>(1);
   const [japanesePage, setJapanesePage] = useState<number>(1);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -171,23 +186,30 @@ const Japan: React.FC = () => {
     setIsJapaneseModalOpen(true);
   };
 
+  const handleModalClose = async () => {
+    setIsJapaneseModalOpen(false);
+
+    // 현재 페이지의 데이터를 가져옴
+    const response = await axios.get(`http://localhost:3001/japanese/page`, {
+      params: { page: japanesePage },
+    });
+
+    // 현재 페이지에 데이터가 없고, 현재 페이지가 1보다 크면 이전 페이지로 이동
+    if (response.data.items.length === 0 && japanesePage > 1) {
+      setJapanesePage((prev) => prev - 1);
+    } else {
+      refreshJapanese();
+    }
+  };
+
   return (
     <div className="p-5 h-screen w-full m-auto">
       {/* Activities Section */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Search Activities"
-            className="border p-2 rounded w-full mb-4"
-          />
-          <button
-            className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4"
-            onClick={handleCreateActivity}
-          >
-            +
-          </button>
-        </div>
+        <SearchCreateSection
+          placeholder="Search Activities"
+          onCreate={handleCreateActivity}
+        />
         <div className="relative h-[55vh]">
           <button
             className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
@@ -243,19 +265,10 @@ const Japan: React.FC = () => {
 
       {/* Japanese Section */}
       <div className="japanese-section">
-        <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Search Japanese"
-            className="border p-2 rounded w-full mb-4"
-          />
-          <button
-            className="ml-4 bg-blue-500 text-white p-2 rounded w-10 h-10 flex items-center justify-center mb-4"
-            onClick={handleCreateJapanese}
-          >
-            +
-          </button>
-        </div>
+        <SearchCreateSection
+          placeholder="Search Japanese"
+          onCreate={handleCreateJapanese}
+        />
         <div className="relative h-[20vh]">
           <button
             onClick={() => handleJapanesePagination("prev")}
@@ -292,10 +305,7 @@ const Japan: React.FC = () => {
         {/* Japanese 모달 컴포넌트 추가 */}
         <JapaneseModal
           isOpen={isJapaneseModalOpen}
-          onClose={() => {
-            setIsJapaneseModalOpen(false);
-            refreshJapanese();
-          }}
+          onClose={handleModalClose}
           japaneseId={selectedJapaneseId}
           userEmail={userEmail}
           refreshJapanese={refreshJapanese}
