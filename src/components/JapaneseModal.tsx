@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "http://localhost:3001";
+
 interface JapaneseModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
@@ -17,7 +19,7 @@ interface Japanese {
   content: string;
 }
 
-const defaultJapanese = {
+const defaultJapanese: Japanese = {
   id: 0,
   email: "",
   date: "",
@@ -36,22 +38,24 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    if (japaneseId !== null) {
-      const fetchJapanese = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:3001/japanese/${japaneseId}`
-          );
-          setJapanese(response.data);
-        } catch (error) {
-          console.error("Error fetching japanese:", error);
-        }
-      };
+    const fetchJapanese = async () => {
+      if (japaneseId === null) {
+        setJapanese(defaultJapanese);
+        return;
+      }
 
-      fetchJapanese();
-    } else {
-      setJapanese(defaultJapanese);
-    }
+      try {
+        const response = await axios.get<Japanese>(
+          `${API_BASE_URL}/japanese/${japaneseId}`
+        );
+        setJapanese(response.data);
+      } catch (error) {
+        console.error("Error fetching japanese:", error);
+        alert("게시물을 불러오는데 실패했습니다.");
+      }
+    };
+
+    fetchJapanese();
   }, [japaneseId]);
 
   if (!isOpen) {
@@ -59,36 +63,46 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
   }
 
   const handleCreateJapanese = async () => {
-    if (japanese) {
-      try {
-        const today = new Date();
-        const formattedDate = today.toISOString().split("T")[0];
+    if (!japanese.title.trim() || !japanese.content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
 
-        const newJapanese = {
-          email: userEmail,
-          date: formattedDate,
-          title: japanese.title,
-          content: japanese.content,
-        };
+    try {
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
 
-        await axios.post(`http://localhost:3001/japanese`, newJapanese);
-        setJapanese(defaultJapanese);
-        onClose(true);
-      } catch (error) {
-        console.error("Error creating japanese:", error);
-      }
+      const newJapanese = {
+        email: userEmail,
+        date: formattedDate,
+        title: japanese.title.trim(),
+        content: japanese.content.trim(),
+      };
+
+      await axios.post(`${API_BASE_URL}/japanese`, newJapanese);
+      await refreshJapanese();
+      setJapanese(defaultJapanese);
+      onClose(true);
+    } catch (error) {
+      console.error("Error creating japanese:", error);
+      alert("게시물 생성에 실패했습니다.");
     }
   };
 
   const handleEditJapanese = async () => {
+    if (!japanese.title.trim() || !japanese.content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
     try {
       const updatedJapanese = {
-        title: japanese.title,
-        content: japanese.content,
+        title: japanese.title.trim(),
+        content: japanese.content.trim(),
       };
 
       await axios.patch(
-        `http://localhost:3001/japanese/${japaneseId}`,
+        `${API_BASE_URL}/japanese/${japaneseId}`,
         updatedJapanese
       );
       await refreshJapanese();
@@ -96,6 +110,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       onClose(false);
     } catch (error) {
       console.error("Error editing japanese:", error);
+      alert("게시물 수정에 실패했습니다.");
     }
   };
 
@@ -104,11 +119,12 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
 
     if (isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3001/japanese/${japaneseId}`);
+        await axios.delete(`${API_BASE_URL}/japanese/${japaneseId}`);
         await refreshJapanese();
         onClose(false);
       } catch (error) {
         console.error("Error deleting japanese:", error);
+        alert("게시물 삭제에 실패했습니다.");
       }
     }
   };

@@ -4,6 +4,9 @@ import axios from "axios";
 import ActivitiesModal from "../components/ActivitiesModal";
 import JapaneseModal from "../components/JapaneseModal";
 
+const API_BASE_URL = "http://localhost:3001";
+const ITEMS_PER_PAGE = 3;
+
 interface ContentItem {
   id: number;
   email: string;
@@ -48,17 +51,15 @@ const Japan: React.FC = () => {
   const [isJapaneseModalOpen, setIsJapaneseModalOpen] =
     useState<boolean>(false);
 
-  const limit = 3;
-
   // 활동 목록을 새로고침하는 함수
   const refreshActivities = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/activities/page`,
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/activities/page`,
         {
           params: {
             page: activitiesPage,
-            limit: limit,
+            limit: ITEMS_PER_PAGE,
           },
         }
       );
@@ -66,6 +67,7 @@ const Japan: React.FC = () => {
       setTotalActivities(response.data.total);
     } catch (error) {
       console.error("Error fetching activities:", error);
+      alert("활동 목록을 불러오는데 실패했습니다.");
     }
   };
 
@@ -91,12 +93,12 @@ const Japan: React.FC = () => {
   // 페이지네이션 데이터를 가져오는 함수
   const fetchPaginatedActivities = async (page: number) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/activities/page`,
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/activities/page`,
         {
           params: {
             page: page,
-            limit: limit,
+            limit: ITEMS_PER_PAGE,
           },
         }
       );
@@ -104,18 +106,25 @@ const Japan: React.FC = () => {
       setTotalActivities(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated activities:", error);
+      alert("활동 목록을 불러오는데 실패했습니다.");
     }
   };
 
   const fetchPaginatedJapanese = async (page: number) => {
     try {
-      const response = await axios.get(`http://localhost:3001/japanese/page`, {
-        params: { page: page },
-      });
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/japanese/page`,
+        {
+          params: {
+            page: page,
+          },
+        }
+      );
       setJapanese(response.data.items);
       setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated japanese:", error);
+      alert("게시물 목록을 불러오는데 실패했습니다.");
     }
   };
 
@@ -129,24 +138,21 @@ const Japan: React.FC = () => {
   }, [japanesePage]);
 
   const handleActivitiesPagination = (direction: "prev" | "next") => {
-    if (direction === "next") {
-      const nextPage = activitiesPage + 1;
-      if ((nextPage - 1) * limit < totalActivities) {
-        setActivitiesPage(nextPage);
-      }
-    } else {
-      setActivitiesPage((prevPage) => Math.max(prevPage - 1, 1));
+    if (
+      direction === "next" &&
+      activitiesPage * ITEMS_PER_PAGE < totalActivities
+    ) {
+      setActivitiesPage((prev) => prev + 1);
+    } else if (direction === "prev" && activitiesPage > 1) {
+      setActivitiesPage((prev) => prev - 1);
     }
   };
 
   const handleJapanesePagination = (direction: "prev" | "next") => {
-    if (direction === "next") {
-      const nextPage = japanesePage + 1;
-      if (nextPage - 1 < totalJapanese) {
-        setJapanesePage(nextPage);
-      }
-    } else {
-      setJapanesePage((prevPage) => Math.max(prevPage - 1, 1));
+    if (direction === "next" && japanesePage < totalJapanese) {
+      setJapanesePage((prev) => prev + 1);
+    } else if (direction === "prev" && japanesePage > 1) {
+      setJapanesePage((prev) => prev - 1);
     }
   };
 
@@ -159,15 +165,19 @@ const Japan: React.FC = () => {
   // Japanese 목록을 새로고침하는 함수
   const refreshJapanese = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/japanese/page`, {
-        params: {
-          page: japanesePage,
-        },
-      });
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/japanese/page`,
+        {
+          params: {
+            page: japanesePage,
+          },
+        }
+      );
       setJapanese(response.data.items);
       setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching japanese:", error);
+      alert("게시물 목록을 불러오는데 실패했습니다.");
     }
   };
 
@@ -188,17 +198,24 @@ const Japan: React.FC = () => {
 
   const handleModalClose = async () => {
     setIsJapaneseModalOpen(false);
+    try {
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/japanese/page`,
+        {
+          params: {
+            page: japanesePage,
+          },
+        }
+      );
 
-    // 현재 페이지의 데이터를 가져옴
-    const response = await axios.get(`http://localhost:3001/japanese/page`, {
-      params: { page: japanesePage },
-    });
-
-    // 현재 페이지에 데이터가 없고, 현재 페이지가 1보다 크면 이전 페이지로 이동
-    if (response.data.items.length === 0 && japanesePage > 1) {
-      setJapanesePage((prev) => prev - 1);
-    } else {
-      refreshJapanese();
+      if (response.data.items.length === 0 && japanesePage > 1) {
+        setJapanesePage((prev) => prev - 1);
+      } else {
+        await refreshJapanese();
+      }
+    } catch (error) {
+      console.error("Error checking page data:", error);
+      alert("데이터 확인에 실패했습니다.");
     }
   };
 
@@ -242,10 +259,12 @@ const Japan: React.FC = () => {
           </div>
           <button
             className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
-              activitiesPage * limit >= totalActivities ? "text-gray-300" : ""
+              activitiesPage * ITEMS_PER_PAGE >= totalActivities
+                ? "text-gray-300"
+                : ""
             }`}
             onClick={() => handleActivitiesPagination("next")}
-            disabled={activitiesPage * limit >= totalActivities}
+            disabled={activitiesPage * ITEMS_PER_PAGE >= totalActivities}
           >
             &gt;
           </button>

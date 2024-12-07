@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE_URL = "http://localhost:3001";
+
 interface ActivitiesModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
@@ -18,7 +20,7 @@ interface Activity {
   mediaUrl: string;
 }
 
-const defaultActivity = {
+const defaultActivity: Activity = {
   id: 0,
   email: "",
   date: "",
@@ -39,24 +41,26 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (activityId !== null) {
-      const fetchActivity = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:3001/activities/${activityId}`
-          );
-          setActivity(response.data);
-          setSelectedFile(null);
-        } catch (error) {
-          console.error("Error fetching activity:", error);
-        }
-      };
+    const fetchActivity = async () => {
+      if (activityId === null) {
+        setActivity(defaultActivity);
+        setSelectedFile(null);
+        return;
+      }
 
-      fetchActivity();
-    } else {
-      setActivity(defaultActivity);
-      setSelectedFile(null);
-    }
+      try {
+        const response = await axios.get<Activity>(
+          `${API_BASE_URL}/activities/${activityId}`
+        );
+        setActivity(response.data);
+        setSelectedFile(null);
+      } catch (error) {
+        console.error("Error fetching activity:", error);
+        alert("활동을 불러오는데 실패했습니다.");
+      }
+    };
+
+    fetchActivity();
   }, [activityId]);
 
   if (!isOpen) {
@@ -64,59 +68,69 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   }
 
   const handleCreateActivity = async () => {
-    if (activity) {
-      try {
-        const today = new Date();
-        const formattedDate = today.toISOString().split("T")[0];
-
-        const formData = new FormData();
-        formData.append("email", userEmail);
-        formData.append("date", formattedDate);
-        formData.append("title", activity.title);
-        formData.append("content", activity.content);
-
-        if (selectedFile) {
-          formData.append("image", selectedFile);
-        }
-        await axios.post(`http://localhost:3001/activities`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        await refreshActivities();
-        setActivity(defaultActivity);
-        setSelectedFile(null);
-        onClose(true);
-      } catch (error) {
-        console.error("Error creating activity:", error);
-      }
+    if (!activity.title.trim() || !activity.content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
     }
-  };
 
-  const handleEditActivity = async () => {
     try {
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
+
       const formData = new FormData();
-      formData.append("title", activity.title);
-      formData.append("content", activity.content);
+      formData.append("email", userEmail);
+      formData.append("date", formattedDate);
+      formData.append("title", activity.title.trim());
+      formData.append("content", activity.content.trim());
 
       if (selectedFile) {
         formData.append("image", selectedFile);
       }
-      await axios.patch(
-        `http://localhost:3001/activities/${activityId}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+
+      await axios.post(`${API_BASE_URL}/activities`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      await refreshActivities();
+      setActivity(defaultActivity);
+      setSelectedFile(null);
+      onClose(true);
+    } catch (error) {
+      console.error("Error creating activity:", error);
+      alert("활동 생성에 실패했습니다.");
+    }
+  };
+
+  const handleEditActivity = async () => {
+    if (!activity.title.trim() || !activity.content.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("title", activity.title.trim());
+      formData.append("content", activity.content.trim());
+
+      if (selectedFile) {
+        formData.append("image", selectedFile);
+      }
+
+      await axios.patch(`${API_BASE_URL}/activities/${activityId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       await refreshActivities();
       setIsEditing(false);
       setSelectedFile(null);
       onClose(false);
     } catch (error) {
       console.error("Error editing activity:", error);
+      alert("활동 수정에 실패했습니다.");
     }
   };
 
@@ -125,7 +139,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 
     if (isConfirmed) {
       try {
-        await axios.delete(`http://localhost:3001/activities/${activityId}`);
+        await axios.delete(`${API_BASE_URL}/activities/${activityId}`);
         await refreshActivities();
         onClose(false);
       } catch (error) {
