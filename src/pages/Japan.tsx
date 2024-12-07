@@ -7,15 +7,18 @@ import JapaneseModal from "../components/JapaneseModal";
 const API_BASE_URL = "http://localhost:3001";
 const ITEMS_PER_PAGE = 3;
 
+// 각 콘텐츠 항목의 데이터 구조를 정의
 interface ContentItem {
   id: number;
   email: string;
   date: string;
+  // 선택적 속성
   title?: string;
   content?: string;
   mediaUrl?: string;
 }
 
+// 검색 및 생성 섹션 컴포넌트
 const SearchCreateSection: React.FC<{
   placeholder: string;
   onCreate: () => void;
@@ -35,41 +38,36 @@ const SearchCreateSection: React.FC<{
   </div>
 );
 
+// 메인 컴포넌트
 const Japan: React.FC = () => {
+  // 데이터 리스트를 저장
   const [activities, setActivities] = useState<ContentItem[]>([]);
   const [japanese, setJapanese] = useState<ContentItem[]>([]);
+
+  // 데이터의 현재 페이지를 저장
   const [activitiesPage, setActivitiesPage] = useState<number>(1);
   const [japanesePage, setJapanesePage] = useState<number>(1);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selcetedID, setSelectedID] = useState<number | null>(null);
-  const [userEmail, setUserEmail] = useState<string>("");
-  const [selectedJapaneseId, setSelectedJapaneseId] = useState<number | null>(
-    null
-  );
-  const [totalActivities, setTotalActivities] = useState<number>(0);
-  const [totalJapanese, setTotalJapanese] = useState<number>(0);
+
+  // 모달의 열림 상태를 정의
+  const [isActivitiesModalOpen, setIsActivitiesModalOpen] =
+    useState<boolean>(false);
   const [isJapaneseModalOpen, setIsJapaneseModalOpen] =
     useState<boolean>(false);
 
-  // 활동 목록을 새로고침하는 함수
-  const refreshActivities = async () => {
-    try {
-      const response = await axios.get<{ items: ContentItem[]; total: number }>(
-        `${API_BASE_URL}/activities/page`,
-        {
-          params: {
-            page: activitiesPage,
-            limit: ITEMS_PER_PAGE,
-          },
-        }
-      );
-      setActivities(response.data.items);
-      setTotalActivities(response.data.total);
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-      alert("활동 목록을 불러오는데 실패했습니다.");
-    }
-  };
+  // 선택한 데이터의 ID를 저장
+  const [selectedActivitiesId, setSelectedActivitiesId] = useState<
+    number | null
+  >(null);
+  const [selectedJapaneseId, setSelectedJapaneseId] = useState<number | null>(
+    null
+  );
+
+  // 데이터의 총 개수를 저장
+  const [totalActivities, setTotalActivities] = useState<number>(0);
+  const [totalJapanese, setTotalJapanese] = useState<number>(0);
+
+  // 현재 사용자의 이메일 정보를 저장
+  const [userEmail, setUserEmail] = useState<string>("");
 
   // 컴포넌트 마운트 시 세션스토리지에서 유저 정보 가져오기
   useEffect(() => {
@@ -80,15 +78,6 @@ const Japan: React.FC = () => {
     }
     setUserEmail(email);
   }, []);
-
-  const handleCreateActivity = () => {
-    if (!userEmail) {
-      alert("로그인이 필요합니다.");
-      return;
-    }
-    setSelectedID(null);
-    setIsModalOpen(true);
-  };
 
   // 페이지네이션 데이터를 가져오는 함수
   const fetchPaginatedActivities = async (page: number) => {
@@ -110,6 +99,81 @@ const Japan: React.FC = () => {
     }
   };
 
+  // 활동 목록을 새로고침하는 함수
+  const refreshActivities = async () => {
+    try {
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/activities/page`,
+        {
+          params: {
+            page: activitiesPage,
+            limit: ITEMS_PER_PAGE,
+          },
+        }
+      );
+      setActivities(response.data.items);
+      setTotalActivities(response.data.total);
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+      alert("활동 목록을 불러오는데 실패했습니다.");
+    }
+  };
+
+  // 활동 생성 함수
+  const handleCreateActivity = () => {
+    if (!userEmail) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    setSelectedActivitiesId(null);
+    setIsActivitiesModalOpen(true);
+  };
+
+  // 활동 카드를 클릭 시 모달 열기
+  const handleActivityClick = (id: number) => {
+    console.log(`Card ${id} clicked`);
+    setSelectedActivitiesId(id);
+    setIsActivitiesModalOpen(true);
+  };
+
+  // 활동 모달 닫기 함수
+  const handleActivitiesModalClose = async () => {
+    setIsActivitiesModalOpen(false);
+    try {
+      const response = await axios.get<{ items: ContentItem[]; total: number }>(
+        `${API_BASE_URL}/activities/page`,
+        {
+          params: {
+            page: activitiesPage,
+            limit: ITEMS_PER_PAGE,
+          },
+        }
+      );
+
+      if (response.data.items.length === 0 && activitiesPage > 1) {
+        setActivitiesPage((prev) => prev - 1);
+      } else {
+        await refreshActivities();
+      }
+    } catch (error) {
+      console.error("Error checking page data:", error);
+      alert("데이터 확인에 실패했습니다.");
+    }
+  };
+
+  // 활동의 페이지네이션 함수
+  const handleActivitiesPagination = (direction: "prev" | "next") => {
+    if (
+      direction === "next" &&
+      activitiesPage * ITEMS_PER_PAGE < totalActivities
+    ) {
+      setActivitiesPage((prev) => prev + 1);
+    } else if (direction === "prev" && activitiesPage > 1) {
+      setActivitiesPage((prev) => prev - 1);
+    }
+  };
+
+  // 일본어 목록을 불러오는 함수
   const fetchPaginatedJapanese = async (page: number) => {
     try {
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
@@ -128,41 +192,7 @@ const Japan: React.FC = () => {
     }
   };
 
-  // 페이지 변경 시 데이터 로드
-  useEffect(() => {
-    fetchPaginatedActivities(activitiesPage);
-  }, [activitiesPage]);
-
-  useEffect(() => {
-    fetchPaginatedJapanese(japanesePage);
-  }, [japanesePage]);
-
-  const handleActivitiesPagination = (direction: "prev" | "next") => {
-    if (
-      direction === "next" &&
-      activitiesPage * ITEMS_PER_PAGE < totalActivities
-    ) {
-      setActivitiesPage((prev) => prev + 1);
-    } else if (direction === "prev" && activitiesPage > 1) {
-      setActivitiesPage((prev) => prev - 1);
-    }
-  };
-
-  const handleJapanesePagination = (direction: "prev" | "next") => {
-    if (direction === "next" && japanesePage < totalJapanese) {
-      setJapanesePage((prev) => prev + 1);
-    } else if (direction === "prev" && japanesePage > 1) {
-      setJapanesePage((prev) => prev - 1);
-    }
-  };
-
-  const handleActivityClick = (id: number) => {
-    console.log(`Card ${id} clicked`);
-    setSelectedID(id);
-    setIsModalOpen(true);
-  };
-
-  // Japanese 목록을 새로고침하는 함수
+  // 일본어 목록을 새로고침하는 함수
   const refreshJapanese = async () => {
     try {
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
@@ -181,6 +211,7 @@ const Japan: React.FC = () => {
     }
   };
 
+  // 일본어 생성 함수
   const handleCreateJapanese = () => {
     if (!userEmail) {
       alert("로그인이 필요합니다.");
@@ -190,13 +221,15 @@ const Japan: React.FC = () => {
     setIsJapaneseModalOpen(true);
   };
 
+  // 일본어 카드를 클릭 시 모달 열기
   const handleJapaneseClick = (id: number) => {
     console.log(`Japanese ${id} clicked`);
     setSelectedJapaneseId(id);
     setIsJapaneseModalOpen(true);
   };
 
-  const handleModalClose = async () => {
+  // 일본어 모달 닫기 함수
+  const handleJapaneseModalClose = async () => {
     setIsJapaneseModalOpen(false);
     try {
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
@@ -218,6 +251,24 @@ const Japan: React.FC = () => {
       alert("데이터 확인에 실패했습니다.");
     }
   };
+
+  // 일본어의 페이지네이션 함수
+  const handleJapanesePagination = (direction: "prev" | "next") => {
+    if (direction === "next" && japanesePage < totalJapanese) {
+      setJapanesePage((prev) => prev + 1);
+    } else if (direction === "prev" && japanesePage > 1) {
+      setJapanesePage((prev) => prev - 1);
+    }
+  };
+
+  // 페이지 변경 시 데이터 로드
+  useEffect(() => {
+    fetchPaginatedActivities(activitiesPage);
+  }, [activitiesPage]);
+
+  useEffect(() => {
+    fetchPaginatedJapanese(japanesePage);
+  }, [japanesePage]);
 
   return (
     <div className="p-5 h-screen w-full m-auto">
@@ -270,12 +321,9 @@ const Japan: React.FC = () => {
           </button>
           {/* 모달 컴포넌트 추가 */}
           <ActivitiesModal
-            isOpen={isModalOpen}
-            onClose={() => {
-              setIsModalOpen(false);
-              refreshActivities(); // 모달이 닫힐 때 활동 목록 새로고침
-            }}
-            activityId={selcetedID}
+            isOpen={isActivitiesModalOpen}
+            onClose={handleActivitiesModalClose}
+            activityId={selectedActivitiesId}
             userEmail={userEmail}
             refreshActivities={refreshActivities} // 새로운 prop 추가
           />
@@ -324,7 +372,7 @@ const Japan: React.FC = () => {
         {/* Japanese 모달 컴포넌트 추가 */}
         <JapaneseModal
           isOpen={isJapaneseModalOpen}
-          onClose={handleModalClose}
+          onClose={handleJapaneseModalClose}
           japaneseId={selectedJapaneseId}
           userEmail={userEmail}
           refreshJapanese={refreshJapanese}
