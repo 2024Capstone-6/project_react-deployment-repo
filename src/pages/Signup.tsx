@@ -6,12 +6,10 @@ const Signup: React.FC = () => {
 
   const [Nickname, setNickname] = useState("");
   const [errorNickname, setErrorNickname] = useState("");
-  const [isNicknameValid, setIsNicknameValid] = useState(false);
   const [isNicknameChecked, setIsNicknameChecked] = useState(false);
 
   const [Email, setEmail] = useState("");
   const [errorEmail, setErrorEmail] = useState("");
-  const [isEmailValid, setIsEmailValid] = useState(false);
   const [isEmailChecked, setIsEmailChecked] = useState(false);
 
   const [Password, setPassword] = useState("");
@@ -22,34 +20,51 @@ const Signup: React.FC = () => {
   const [errorPasswordDouble, setErrorPasswordDouble] = useState("");
   const [isPasswordDoubleValid, setIsPasswordDoubleValid] = useState(false);
 
-  const nicknameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.currentTarget.value);
-    const nicknameRegex = /^[a-zA-Z가-힣0-9]{3,10}$/;
-
-    if (nicknameRegex.test(e.currentTarget.value)) {
-      setIsNicknameValid(true);
-      setErrorNickname("");
-    } else {
-      setErrorNickname("Please enter the nickname in 3 to 10 characters.");
-      setIsNicknameValid(false);
+  // 닉네임 중복 확인 및 정규식 검사
+  const checkNickname = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/userdt/check-nickname?nickname=${Nickname}`);
+      const data = await response.json();
+  
+      if (!data.valid) {
+        setErrorNickname("Please check enter 3 to 10 characters.");
+        setIsNicknameChecked(false);
+      } else if (!data.available) {
+        setErrorNickname("Nickname is already taken.");
+        setIsNicknameChecked(false);
+      } else {
+        setErrorNickname("Nickname is available.");
+        setIsNicknameChecked(true);
+      }
+    } catch (error) {
+      console.error("Error checking nickname:", error);
+      setErrorNickname("An error occurred. Please try again.");
     }
-    setIsNicknameChecked(false);
   };
 
-  const emailHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.currentTarget.value);
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (emailRegex.test(e.currentTarget.value)) {
-      setErrorEmail("");
-      setIsEmailValid(true);
-    } else {
-      setErrorEmail("Please enter a valid email.");
-      setIsEmailValid(false);
+  // 이메일 중복 확인 및 정규식 검사
+  const checkEmail = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/userdt/check-email?email=${Email}`);
+      const data = await response.json();
+  
+      if (!data.valid) {
+        setErrorEmail("Please enter a valid email address.");
+        setIsEmailChecked(false);
+      } else if (!data.available) {
+        setErrorEmail("Email is already taken.");
+        setIsEmailChecked(false);
+      } else {
+        setErrorEmail("Email is available.");
+        setIsEmailChecked(true);
+      }
+    } catch (error) {
+      console.error("Error checking email:", error);
+      setErrorEmail("An error occurred. Please try again.");
     }
-    setIsEmailChecked(false);
   };
 
+  // 비밀번호 유효성 검사
   const passwordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.currentTarget.value);
     const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,}$/;
@@ -63,6 +78,7 @@ const Signup: React.FC = () => {
     }
   };
 
+  // 비밀번호 확인 로직
   const passwordDoubleHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordDouble(e.currentTarget.value);
   };
@@ -77,62 +93,11 @@ const Signup: React.FC = () => {
     }
   }, [Password, PasswordDouble]);
 
-  const checkNickname = async () => {
-    if (!isNicknameValid) {
-      alert("Please enter a valid nickname before checking.");
-      return;
-    }
-  
-    try {
-      const response = await fetch(`http://localhost:3001/userdt/check-nickname?nickname=${Nickname}`);
-      const data = await response.json();
-      if (data.available) {
-        setErrorNickname("Nickname is available.");
-        setIsNicknameChecked(true);
-      } else {
-        setErrorNickname("Nickname is already taken.");
-        setIsNicknameChecked(false);
-      }
-    } catch (error) {
-      console.error("Error checking nickname:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
-
-  const checkEmail = async () => {
-    if (!isEmailValid) {
-      alert("Please enter a valid email before checking.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`http://localhost:3001/userdt/check-email?email=${Email}`);
-      const data = await response.json();
-      if (data.available) {
-        setErrorEmail("Email is available.");
-        setIsEmailChecked(true);
-      } else {
-        setErrorEmail("Email is already taken.");
-        setIsEmailChecked(false);
-      }
-    } catch (error) {
-      console.error("Error checking email:", error);
-      alert("An error occurred. Please try again.");
-    }
-  };
-
   const submitButton = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !isNicknameValid || 
-      !isEmailValid || 
-      !isPasswordValid || 
-      !isPasswordDoubleValid || 
-      !isNicknameChecked || 
-      !isEmailChecked
-    ) {
-      alert("Please enter valid information and check nickname/email duplication.");
+    if (!isNicknameChecked || !isEmailChecked || !isPasswordValid || !isPasswordDoubleValid) {
+      alert("Please complete all fields and ensure data is valid before submitting.");
       return;
     }
 
@@ -169,20 +134,17 @@ const Signup: React.FC = () => {
       <div className="w-1/2 bg-white p-20 rounded-lg shadow-lg">
         <form className="w-full">
           <h2 className="text-2xl font-bold mb-6 text-center">Sign up</h2>
-          <div className="mb-4">
+          <div className="mb">
             <label className="block font-medium mb-1">Nickname</label>
-            <div className="flex">
-              <input
-                type="text"
-                name="Nickname"
-                value={Nickname}
-                onChange={nicknameHandler}
-                className="border p-3 w-full rounded-md"
-              />
-              <button type="button" onClick={checkNickname} className="ml-2 bg-gray-800 text-white px-4 py-2 rounded-md">
-                Check
-              </button>
-            </div>
+            <input
+              type="text"
+              name="Nickname"
+              value={Nickname}
+              onChange={(e) => setNickname(e.currentTarget.value)}
+              onBlur={checkNickname}
+              placeholder="Please enter 3 to 10 characters"
+              className="border p-3 w-full rounded-md"
+            />
             {errorNickname && (
               <p className={errorNickname === "Nickname is available." ? "text-blue-600" : "text-red-600"}>
                 {errorNickname}
@@ -191,18 +153,15 @@ const Signup: React.FC = () => {
           </div>
           <div className="mb-4">
             <label className="block font-medium mb-1">Email</label>
-            <div className="flex">
-              <input
-                type="email"
-                name="email"
-                value={Email}
-                onChange={emailHandler}
-                className="border p-3 w-full rounded-md"
-              />
-              <button type="button" onClick={checkEmail} className="ml-2 bg-gray-800 text-white px-4 py-2 rounded-md">
-                Check
-              </button>
-            </div>
+            <input
+              type="email"
+              name="Email"
+              value={Email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              onBlur={checkEmail}
+              placeholder="example@example.com"
+              className="border p-3 w-full rounded-md"
+            />
             {errorEmail && (
               <p className={errorEmail === "Email is available." ? "text-blue-600" : "text-red-600"}>
                 {errorEmail}
@@ -216,23 +175,29 @@ const Signup: React.FC = () => {
               name="Password"
               value={Password}
               onChange={passwordHandler}
+              placeholder="At least 6 characters with letters and numbers"
               className="border p-3 w-full rounded-md"
             />
             {errorPassword && <p className="text-red-600">{errorPassword}</p>}
           </div>
           <div className="mb-4">
-            <label className="block font-medium mb-1">Check your Password</label>
+            <label className="block font-medium mb-1">Confirm Password</label>
             <input
               type="password"
               name="PasswordDouble"
               value={PasswordDouble}
               onChange={passwordDoubleHandler}
+              placeholder="Re-enter your Password"
               className="border p-3 w-full rounded-md"
             />
             {errorPasswordDouble && <p className="text-red-600">{errorPasswordDouble}</p>}
           </div>
           <div className="mt-6">
-            <button type="button" onClick={submitButton} className="w-full bg-gray-800 text-white py-3 rounded-lg font-bold">
+            <button
+              type="button"
+              onClick={submitButton}
+              className="w-full bg-gray-800 text-white py-3 rounded-lg font-bold"
+            >
               Join
             </button>
           </div>

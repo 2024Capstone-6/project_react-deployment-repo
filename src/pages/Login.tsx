@@ -38,9 +38,9 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
         console.log(data); // 서버에서 받은 데이터 확인
         
         sessionStorage.setItem("access_token", data.access_token);
-        sessionStorage.setItem("Email", data.user.email);
-        sessionStorage.setItem("Nickname", data.user.nickname);
-        sessionStorage.setItem("UserId", data.user.id);
+        // sessionStorage.setItem("Email", data.user.email);
+        // sessionStorage.setItem("Nickname", data.user.nickname);
+        // sessionStorage.setItem("UserId", data.user.id);
         setUser(data.user.nickname); // 로그인 성공 시 사용자 이름 저장
         navigate("/"); // 메인 페이지로 이동
       } else {
@@ -77,7 +77,7 @@ const Login: React.FC<LoginProps> = ({ setUser }) => {
             name="Password"
             value={Password}
             onChange={passwordHandler}
-            placeholder="Enter your password"
+            placeholder="Enter your Password"
             className="mt-1 p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
