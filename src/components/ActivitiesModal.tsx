@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+// API 기본 URL 설정
 const API_BASE_URL = "http://localhost:3001";
 
+// 활동 모달 컴포넌트의 속성 타입 정의
 interface ActivitiesModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
   activityId: number | null;
   userEmail: string;
-  refreshActivities: () => Promise<void>;
+  refreshActivities: () => Promise<void>; // 활동 데이터 새로고침 함수
 }
 
+// 활동 데이터 인터페이스 정의
 interface Activity {
   id: number;
   email: string;
@@ -20,6 +23,7 @@ interface Activity {
   mediaUrl: string;
 }
 
+// 기본 활동 데이터 초기값 설정
 const defaultActivity: Activity = {
   id: 0,
   email: "",
@@ -29,6 +33,7 @@ const defaultActivity: Activity = {
   mediaUrl: "",
 };
 
+// 활동 생성, 수정, 삭제를 위한 모달 컴포넌트
 const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   isOpen,
   onClose,
@@ -40,6 +45,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // activityId가 변경될 때마다 활동 데이터 가져오기
   useEffect(() => {
     const fetchActivity = async () => {
       if (activityId === null) {
@@ -63,10 +69,12 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     fetchActivity();
   }, [activityId]);
 
+  // 모달이 닫혀있으면 렌더링 하지 않음
   if (!isOpen) {
     return null;
   }
 
+  // 활동 생성
   const handleCreateActivity = async () => {
     if (!activity.title.trim() || !activity.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -103,6 +111,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
   };
 
+  // 활동 수정
   const handleEditActivity = async () => {
     if (!activity.title.trim() || !activity.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -127,13 +136,13 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       await refreshActivities();
       setIsEditing(false);
       setSelectedFile(null);
-      onClose(false);
     } catch (error) {
       console.error("Error editing activity:", error);
       alert("활동 수정에 실패했습니다.");
     }
   };
 
+  // 활동 삭제
   const handleDeleteActivity = async () => {
     const isConfirmed = window.confirm("정말로 이 활동을 삭제하시겠습니까?");
 
@@ -148,17 +157,32 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
   };
 
+  // 파일 변경 이벤트 처리
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 파일 크기 제한 체크
+      if (file.size > 5 * 1024 * 1024) {
+        alert("파일 크기는 5MB 이하여야 합니다.");
+        return;
+      }
+
+      // 이미지 파일 타입 체크
+      if (!file.type.startsWith("image/")) {
+        alert("이미지 파일만 업로드 가능합니다.");
+        return;
+      }
+
       setSelectedFile(file);
+      const previewUrl = URL.createObjectURL(file);
       setActivity({
         ...activity,
-        mediaUrl: URL.createObjectURL(file),
+        mediaUrl: previewUrl,
       });
     }
   };
 
+  // 활동 소유자 확인
   const isOwner = () => {
     return activity?.email === userEmail;
   };
@@ -175,11 +199,25 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
         {activityId === null ? (
           // 게시물 생성
           <div className="flex w-full h-full">
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="bg-slate-300 w-2/5 h-full object-cover rounded-l-lg"
-            />
+            <div className="bg-slate-300 w-2/5 h-full relative">
+              {activity.mediaUrl ? (
+                <img
+                  src={activity.mediaUrl}
+                  alt="미리보기"
+                  className="w-full h-full object-cover rounded-l-lg"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <p className="text-gray-500">이미지를 선택해주세요</p>
+                </div>
+              )}
+              <input
+                type="file"
+                onChange={handleFileChange}
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+            </div>
             <div className="w-3/5 p-6 flex flex-col text-left justify-center">
               <input
                 type="text"
@@ -207,7 +245,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
             </div>
           </div>
         ) : activity ? (
-          // 게시물 수정/조회
+          // 게시물 수정
           <div className="flex w-full h-full">
             <img
               src={activity.mediaUrl}
