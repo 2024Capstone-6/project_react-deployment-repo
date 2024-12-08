@@ -65,16 +65,21 @@ const Signup: React.FC = () => {
   };
 
   // 비밀번호 유효성 검사
-  const passwordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.currentTarget.value);
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9]).{6,}$/;
-
-    if (passwordRegex.test(e.currentTarget.value)) {
-      setErrorPassword("");
-      setIsPasswordValid(true);
-    } else {
-      setErrorPassword("Password must be at least 6 characters, including letters and numbers.");
-      setIsPasswordValid(false);
+  const checkPassword = async () => {
+    try {
+      const response = await fetch(`http://localhost:3001/userdt/check-password?password=${Password}`);
+      const data = await response.json();
+  
+      if (!data.valid) {
+        setErrorPassword("Password must be 6-20 characters, including letters and numbers.");
+        setIsPasswordValid(false);
+      } else {
+        setErrorPassword("");
+        setIsPasswordValid(true);
+      }
+    } catch (error) {
+      console.error("Error checking password:", error);
+      setErrorPassword("An error occurred. Please try again.");
     }
   };
 
@@ -84,12 +89,14 @@ const Signup: React.FC = () => {
   };
 
   useEffect(() => {
-    if (Password === PasswordDouble) {
-      setErrorPasswordDouble("");
-      setIsPasswordDoubleValid(true);
-    } else {
-      setErrorPasswordDouble("Passwords do not match.");
-      setIsPasswordDoubleValid(false);
+    if (Password && PasswordDouble) {
+      if (Password === PasswordDouble) {
+        setErrorPasswordDouble("");
+        setIsPasswordDoubleValid(true);
+      } else {
+        setErrorPasswordDouble("Passwords do not match.");
+        setIsPasswordDoubleValid(false);
+      }
     }
   }, [Password, PasswordDouble]);
 
@@ -134,6 +141,7 @@ const Signup: React.FC = () => {
       <div className="w-1/2 bg-white p-20 rounded-lg shadow-lg">
         <form className="w-full">
           <h2 className="text-2xl font-bold mb-6 text-center">Sign up</h2>
+          {/* 닉네임 */}
           <div className="mb">
             <label className="block font-medium mb-1">Nickname</label>
             <input
@@ -151,6 +159,7 @@ const Signup: React.FC = () => {
               </p>
             )}
           </div>
+          {/* 이메일 */}
           <div className="mb-4">
             <label className="block font-medium mb-1">Email</label>
             <input
@@ -168,18 +177,21 @@ const Signup: React.FC = () => {
               </p>
             )}
           </div>
+          {/* 패스워드 */}
           <div className="mb-4">
             <label className="block font-medium mb-1">Password</label>
             <input
               type="password"
               name="Password"
               value={Password}
-              onChange={passwordHandler}
+              onChange={(e) => setPassword(e.currentTarget.value)}
+              onBlur={checkPassword}
               placeholder="At least 6 characters with letters and numbers"
               className="border p-3 w-full rounded-md"
             />
             {errorPassword && <p className="text-red-600">{errorPassword}</p>}
           </div>
+          {/* 패스워드 체크 */}
           <div className="mb-4">
             <label className="block font-medium mb-1">Confirm Password</label>
             <input
@@ -192,6 +204,7 @@ const Signup: React.FC = () => {
             />
             {errorPasswordDouble && <p className="text-red-600">{errorPasswordDouble}</p>}
           </div>
+          {/* join 버튼 */}
           <div className="mt-6">
             <button
               type="button"
