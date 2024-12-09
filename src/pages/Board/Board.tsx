@@ -81,19 +81,22 @@ const BoardPage: React.FC = () => {
   return (
     <>
       <div className="mainpage">
-        <h1>영딧게시판</h1>
         <div className="boardbox">
           {board.length === 0 ? (
             <p>게시글이 없습니다.</p> // 게시글이 없을 때 메시지 표시
           ) : (
             board.map((item) => (
               <div key={item.id} className="boardlist" onClick={() => navigate(`${item.id}`)}>
-                <h2>제목: {item.title}</h2>
-                <p>내용: {item.content}</p>
-                <p>작성시간: {item.date}</p>
+                <h2 className="board1">번호: {item.id}</h2>
+                <h2 className="board2">{item.title}</h2>
+                <div className="clear">
+                </div>
+                <p className="board3">작성시간: {item.date}</p>
                 {item.imgurl && (
-                <img src={item.imgurl} alt="게시글 이미지" style={{ width: "100px", height: "auto", marginTop: "10px" }} />
+                <img src={item.imgurl} alt="게시글 이미지" className="imgbox" />
+                
               )}
+                <p>{item.content}</p>
               </div>
             ))
           )}

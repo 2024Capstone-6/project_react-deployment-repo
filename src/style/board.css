@@ -47,6 +47,31 @@ body {
   padding: '10px'
 }
 
+.board1 {
+  float: left;
+  margin-right: 5px;
+}
+.board2 {
+  float: left;
+  margin-right: 5px;
+}
+.board3 {
+  text-align: left;
+}
+
+.imgbox {
+  max-width: 500px; 
+  max-height: 400px; 
+  padding: 20px;
+  margin-left:auto;
+  margin-right:auto
+}
+
+.clear {
+  clear: both;
+}
+
+
 .pagination {
   display: flex;
   justify-content: center;
