@@ -26,83 +26,94 @@ const MemberCard: React.FC<MemberCardProps> = ({ memberData, onDelete, onUpdate 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleImageSave = async (selectedImage: File | null) => {
-    if (selectedImage) {
-      const formData = new FormData();
-      formData.append('profileImage', selectedImage);
+    if (!selectedImage) return;
+    const formData = new FormData();
+    formData.append('profileImage', selectedImage);
 
-      try {
-        const response = await fetch(`http://localhost:3001/members/${memberData.id}`, {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/members/${memberData.id}`,
+        {
           method: 'PATCH',
           body: formData,
-        });
-
-        if (response.ok) {
-          const updatedMember = await response.json();
-          onUpdate(updatedMember);
-        } else {
-          console.error('Error updating image');
         }
-      } catch (err) {
-        console.error('Error updating image:', err);
+      );
+      if (response.ok) {
+        const updatedMember = await response.json();
+        onUpdate(updatedMember);
+      } else {
+        console.error('Error updating image');
       }
+    } catch (error) {
+      console.error('Error updating image:', error);
     }
     setIsImageModalOpen(false);
   };
 
   const handleInfoSave = async (updatedInfo: Partial<Member>) => {
     try {
-      const response = await fetch(`http://localhost:3001/members/${memberData.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedInfo),
-      });
-
+      const response = await fetch(
+        `http://localhost:3001/members/${memberData.id}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedInfo),
+        }
+      );
       if (response.ok) {
         const updatedMember = await response.json();
         onUpdate(updatedMember);
       } else {
-        console.error('Error updating member info');
+        console.error('Error updating info');
       }
-    } catch (err) {
-      console.error('Error updating member info:', err);
+    } catch (error) {
+      console.error('Error updating info:', error);
     }
     setIsInfoModalOpen(false);
   };
 
   const handleTechStackSave = (updatedStacks: string[]) => {
-    handleInfoSave({ techStack: updatedStacks });
+    const sortedStacks = updatedStacks.sort(
+      (a, b) =>
+        ['react', 'typescript', 'node', 'tailwind', 'docker'].indexOf(a) -
+        ['react', 'typescript', 'node', 'tailwind', 'docker'].indexOf(b)
+    );
+    onUpdate({ ...memberData, techStack: sortedStacks });
     setIsTechStackModalOpen(false);
+  };
+
+  const openDeleteModal = (e: React.MouseEvent) => {
+    e.preventDefault(); // 기본 우클릭 메뉴 방지
+    setIsDeleteModalOpen(true); // 삭제 모달 열기
   };
 
   return (
     <div
       className="relative flex items-center gap-4 p-6 bg-gradient-to-br from-gray-800 via-gray-900 to-black text-white rounded-lg shadow-lg"
-      onContextMenu={(e) => {
-        e.preventDefault();
-        setIsDeleteModalOpen(true);
-      }}
+      onContextMenu={openDeleteModal} // 우클릭 시 삭제 모달 열기
     >
       <div
-        onClick={() => setIsImageModalOpen(true)}
         className="w-52 h-52 bg-cover bg-center rounded-lg shadow-md cursor-pointer"
         style={{
-          backgroundImage: `url("${
-            memberData.profileImage || 'https://www.yju.ac.kr/sites/kr/images/img_symbol_mark.png'
-          }")`,
+          backgroundImage: `url("${memberData.profileImage || 'https://www.yju.ac.kr/sites/kr/images/img_symbol_mark.png'}")`,
         }}
+        onClick={() => setIsImageModalOpen(true)}
       ></div>
 
-      <MemberInfo info={memberData} onInfoClick={() => setIsInfoModalOpen(true)} />
+      <MemberInfo
+        info={{
+          name: memberData.name,
+          role: memberData.role,
+          comment: memberData.comment,
+          email: memberData.email,
+        }}
+        onInfoClick={() => setIsInfoModalOpen(true)}
+      />
 
-      <div className="w-1/3">
-        <TechStack
-          techStack={memberData.techStack}
-          onStackClick={() => setIsTechStackModalOpen(true)}
-          onContextMenu={(e) => e.preventDefault()} // 우클릭 방지 핸들러 추가
-        />
-      </div>
+      <TechStack
+        techStack={memberData.techStack}
+        onStackClick={() => setIsTechStackModalOpen(true)}
+      />
 
       <Modals
         isImageModalOpen={isImageModalOpen}
@@ -124,7 +135,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ memberData, onDelete, onUpdate 
       />
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded-lg shadow-lg text-black w-1/3">
             <h2 className="text-xl font-semibold mb-4">정말 삭제하시겠습니까?</h2>
             <div className="flex justify-end gap-2">

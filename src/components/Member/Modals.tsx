@@ -1,17 +1,17 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 
 interface ModalsProps {
-  isImageModalOpen: boolean; // 이미지 모달 열림 여부
-  isInfoModalOpen: boolean; // 정보 수정 모달 열림 여부
-  isTechStackModalOpen: boolean; // 기술 스택 수정 모달 열림 여부
-  info: { name: string; role: string; comment: string; email: string }; // 멤버 정보
+  isImageModalOpen: boolean; // 이미지 수정 모달의 상태 (열림/닫힘)
+  isInfoModalOpen: boolean; // 정보 수정 모달의 상태 (열림/닫힘)
+  isTechStackModalOpen: boolean; // 기술 스택 수정 모달의 상태 (열림/닫힘)
+  info: { name: string; role: string; comment: string; email: string }; // 조원 정보
   techStack: string[]; // 기술 스택 배열
-  toggleImageModal: () => void; // 이미지 모달 토글 함수
-  toggleInfoModal: () => void; // 정보 수정 모달 토글 함수
-  toggleTechStackModal: () => void; // 기술 스택 수정 모달 토글 함수
-  onSaveInfo: (updatedInfo: { name: string; role: string; comment: string; email: string }) => void; // 정보 저장 함수
-  onSaveTechStack: (updatedStacks: string[]) => void; // 기술 스택 저장 함수
-  onSaveImage: (selectedImage: File | null) => void; // 이미지 저장 함수
+  toggleImageModal: () => void; // 이미지 모달을 열고 닫는 함수
+  toggleInfoModal: () => void; // 정보 모달을 열고 닫는 함수
+  toggleTechStackModal: () => void; // 기술 스택 모달을 열고 닫는 함수
+  onSaveInfo: (updatedInfo: { name: string; role: string; comment: string; email: string }) => void; // 정보 저장 핸들러
+  onSaveTechStack: (updatedStacks: string[]) => void; // 기술 스택 저장 핸들러
+  onSaveImage: (selectedImage: File | null) => void; // 이미지 저장 핸들러
 }
 
 const Modals: React.FC<ModalsProps> = ({
@@ -27,34 +27,48 @@ const Modals: React.FC<ModalsProps> = ({
   onSaveTechStack,
   onSaveImage,
 }) => {
-  const availableTechStacks = ['react', 'typescript', 'node', 'tailwind', 'docker']; // 선택 가능한 기술 스택
-  const [tempInfo, setTempInfo] = useState(info); // 임시 정보 상태
-  const [selectedStacks, setSelectedStacks] = useState<string[]>(techStack); // 선택된 기술 스택
-  const [selectedImage, setSelectedImage] = useState<File | null>(null); // 선택된 이미지 파일
+  const availableTechStacks = ['react', 'typescript', 'node', 'tailwind', 'docker']; // 선택 가능한 기술 스택 리스트
+  const [tempInfo, setTempInfo] = useState(info); // 정보 수정 모달에서 사용되는 임시 정보 상태
+  const [selectedStacks, setSelectedStacks] = useState<string[]>(techStack); // 기술 스택 모달에서 사용되는 선택된 기술 스택 상태
+  const [selectedImage, setSelectedImage] = useState<File | null>(null); // 선택된 이미지 상태
 
-  // 모달 열릴 때 상태 초기화
   useEffect(() => {
-    if (isInfoModalOpen) setTempInfo(info);
-    if (isTechStackModalOpen) setSelectedStacks(techStack);
-    if (isImageModalOpen) setSelectedImage(null);
+    // 모달이 열릴 때 상태 초기화
+    if (isInfoModalOpen) setTempInfo(info); // 정보 수정 모달의 초기값 설정
+    if (isTechStackModalOpen) setSelectedStacks([...techStack].sort()); // 기술 스택 정렬 후 설정
+    if (isImageModalOpen) setSelectedImage(null); // 이미지 선택 상태 초기화
   }, [isInfoModalOpen, isTechStackModalOpen, isImageModalOpen, info, techStack]);
 
-  // 이미지 선택 핸들러
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    setSelectedImage(file);
+    // 이미지 파일 선택 핸들러
+    const file = e.target.files?.[0] || null; // 선택된 파일이 없으면 null
+    setSelectedImage(file); // 선택된 파일 상태에 저장
   };
 
-  // 기술 스택 선택/해제 토글
+  const saveImage = () => {
+    // 이미지 저장 로직
+    if (selectedImage) {
+      onSaveImage(selectedImage); // 부모 컴포넌트로 이미지 저장 핸들러 호출
+    }
+    toggleImageModal(); // 이미지 모달 닫기
+  };
+
   const toggleStackSelection = (stack: string) => {
+    // 기술 스택 선택/해제 로직
     if (selectedStacks.includes(stack)) {
-      setSelectedStacks(selectedStacks.filter((s) => s !== stack));
+      setSelectedStacks(selectedStacks.filter((s) => s !== stack)); // 이미 선택된 경우 해제
     } else {
-      setSelectedStacks([...selectedStacks, stack]);
+      setSelectedStacks([...selectedStacks, stack]); // 선택되지 않은 경우 추가
     }
   };
 
-  // 모달 렌더링 함수
+  const saveTechStack = () => {
+    // 기술 스택 저장 로직
+    const sortedStacks = [...selectedStacks].sort(); // 저장 전에 정렬
+    onSaveTechStack(sortedStacks); // 부모 컴포넌트로 저장 핸들러 호출
+    toggleTechStackModal(); // 기술 스택 모달 닫기
+  };
+
   const drawModal = (
     isOpen: boolean,
     title: string,
@@ -62,12 +76,13 @@ const Modals: React.FC<ModalsProps> = ({
     saveFunction: () => void,
     closeFunction: () => void
   ) => {
-    if (!isOpen) return null;
+    // 공통 모달 컴포넌트 렌더링 함수
+    if (!isOpen) return null; // 모달이 닫혀 있으면 렌더링하지 않음
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white p-8 rounded-lg shadow-lg text-black w-1/3">
           <h2 className="text-xl font-semibold mb-4">{title}</h2>
-          {content}
+          {content} {/* 모달 내용 렌더링 */}
           <div className="flex justify-end gap-2 mt-4">
             <button
               onClick={closeFunction}
@@ -89,7 +104,7 @@ const Modals: React.FC<ModalsProps> = ({
 
   return (
     <>
-      {/* 이미지 변경 모달 */}
+      {/* 이미지 수정 모달 */}
       {drawModal(
         isImageModalOpen,
         'Change Profile Image',
@@ -97,14 +112,11 @@ const Modals: React.FC<ModalsProps> = ({
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={handleImageChange} // 이미지 변경 핸들러
             className="p-2 border rounded"
           />
         </div>,
-        () => {
-          onSaveImage(selectedImage);
-          toggleImageModal();
-        },
+        saveImage,
         toggleImageModal
       )}
 
@@ -154,14 +166,14 @@ const Modals: React.FC<ModalsProps> = ({
           {availableTechStacks.map((stack) => (
             <button
               key={stack}
-              onClick={() => toggleStackSelection(stack)}
+              onClick={() => toggleStackSelection(stack)} // 스택 선택/해제
               className={`relative w-12 h-12 flex items-center justify-center rounded-full border ${
                 selectedStacks.includes(stack) ? 'bg-blue-500' : 'bg-gray-100'
               }`}
             >
               <img
-                src={`/images/Member/${stack}.png`}
-                alt={stack}
+                src={`/images/Member/${stack}.png`} // 기술 스택 이미지 경로
+                alt={stack} // 이미지 대체 텍스트
                 className="w-full h-full object-cover rounded-full"
               />
               {selectedStacks.includes(stack) && (
@@ -172,7 +184,7 @@ const Modals: React.FC<ModalsProps> = ({
             </button>
           ))}
         </div>,
-        () => onSaveTechStack(selectedStacks),
+        saveTechStack,
         toggleTechStackModal
       )}
     </>
