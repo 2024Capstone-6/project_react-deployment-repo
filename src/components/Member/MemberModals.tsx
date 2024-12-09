@@ -14,7 +14,7 @@ interface ModalsProps {
   onSaveImage: (selectedImage: File | null) => void; // 이미지 저장 핸들러
 }
 
-const Modals: React.FC<ModalsProps> = ({
+const MemberModals: React.FC<ModalsProps> = ({
   isImageModalOpen,
   isInfoModalOpen,
   isTechStackModalOpen,
@@ -191,4 +191,4 @@ const Modals: React.FC<ModalsProps> = ({
   );
 };
 
-export default Modals;
+export default MemberModals;

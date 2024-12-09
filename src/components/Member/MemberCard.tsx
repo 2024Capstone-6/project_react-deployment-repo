@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import MemberInfo from './MemberInfo';
 import TechStack from './TechStack';
-import Modals from './Modals';
+import Modals from './MemberModals';
 
 interface Member {
   id: number;
