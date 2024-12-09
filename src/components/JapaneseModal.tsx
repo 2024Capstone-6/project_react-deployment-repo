@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+// API 서버 주소
 const API_BASE_URL = "http://localhost:3001";
 
+// 부모 컴포넌트로부터 전달받는 props 타입 정의
 interface JapaneseModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
@@ -11,6 +13,7 @@ interface JapaneseModalProps {
   refreshJapanese: () => Promise<void>;
 }
 
+// 게시물 데이터 타입 정의
 interface Japanese {
   id: number;
   email: string;
@@ -19,6 +22,7 @@ interface Japanese {
   content: string;
 }
 
+// 기본 게시물 데이터 초기값
 const defaultJapanese: Japanese = {
   id: 0,
   email: "",
@@ -27,6 +31,7 @@ const defaultJapanese: Japanese = {
   content: "",
 };
 
+// 컴포넌트 정의
 const JapaneseModal: React.FC<JapaneseModalProps> = ({
   isOpen,
   onClose,
@@ -34,9 +39,12 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
   userEmail,
   refreshJapanese,
 }) => {
+  // 게시물 데이터 상태 관리
   const [japanese, setJapanese] = useState<Japanese>(defaultJapanese);
+  // 수정 모드 상태 관리
   const [isEditing, setIsEditing] = useState(false);
 
+  // japaneseId가 변경될 때마다 게시물 데이터 가져오기
   useEffect(() => {
     const fetchJapanese = async () => {
       if (japaneseId === null) {
@@ -62,6 +70,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     return null;
   }
 
+  // 일본어 생성
   const handleCreateJapanese = async () => {
     if (!japanese.title.trim() || !japanese.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -89,6 +98,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
   };
 
+  // 일본어 수정
   const handleEditJapanese = async () => {
     if (!japanese.title.trim() || !japanese.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -114,6 +124,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
   };
 
+  // 일본어 삭제
   const handleDeleteJapanese = async () => {
     const isConfirmed = window.confirm("정말로 이 게시물을 삭제하시겠습니까?");
 
@@ -129,6 +140,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
   };
 
+  // 게시물 작성자 확인
   const isOwner = () => {
     return japanese?.email === userEmail;
   };
@@ -176,7 +188,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
             </div>
           </div>
         ) : japanese ? (
-          // 게시물 수정/조회
+          // 게시물 수정
           <div className="flex w-full h-full items-center justify-center">
             <div className="w-1/2 flex flex-col text-left">
               {isEditing ? (
