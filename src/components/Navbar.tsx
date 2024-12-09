@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
@@ -11,11 +11,12 @@ export default function Navbar() {
     { path: "/special", label: "Special" },
   ];
 
-// 로그아웃 처리 함수
-    const handleLogout = () => {
-      sessionStorage.clear(); // 세션 스토리지 지우기
-      navigate('/login'); // 로그인 페이지로 리다이렉트
-    };
+  // 로그아웃 처리 함수
+  const handleLogout = () => {
+    sessionStorage.clear(); // 세션 스토리지 지우기
+    navigate("/login"); // 로그인 페이지로 리다이렉트
+    window.location.reload();
+  };
 
   return (
     <div className="fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-md flex flex-col p-4">
