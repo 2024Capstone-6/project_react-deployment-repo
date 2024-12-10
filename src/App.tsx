@@ -34,7 +34,7 @@ function App() {
       <Router>
         <div className="flex">
           {user && <Navbar />} {/* 로그인 시에만 Navbar 표시 */}
-          <div className="ml-72 mt-4 p-4 flex-1">
+          <div className={`mt-4 p-4 flex-1 ${user ? "ml-72" : ""}`}>
             <Routes>
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="/login" element={<Login setUser={setUser} />} />
