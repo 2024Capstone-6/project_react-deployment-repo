@@ -22,11 +22,15 @@ interface ContentItem {
 const SearchCreateSection: React.FC<{
   placeholder: string;
   onCreate: () => void;
-}> = ({ placeholder, onCreate }) => (
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+}> = ({ placeholder, onCreate, searchTerm, onSearchChange }) => (
   <div className="flex justify-between items-center mb-4">
     <input
       type="text"
       placeholder={placeholder}
+      value={searchTerm}
+      onChange={(e) => onSearchChange(e.target.value)}
       className="border p-2 rounded w-full mb-4"
     />
     <button
@@ -77,9 +81,39 @@ const Japan: React.FC = () => {
       return;
     }
     setUserEmail(email);
+    fetchAllActivities();
+    fetchAllJapanese();
   }, []);
 
-  // 페이지네이션 데이터를 가져오는 함수
+  // 모든 데이터를 저장
+  const [allActivities, setAllActivities] = useState<ContentItem[]>([]);
+  const [allJapanese, setAllJapanese] = useState<ContentItem[]>([]);
+  
+  // 모든 활동 데이터를 불러와서 저장
+  const fetchAllActivities = async () => {
+    try {
+      const response = await axios.get<ContentItem[]>(
+        `${API_BASE_URL}/activities`
+      );
+      setAllActivities(response.data);
+    } catch (error) {
+      console.error("Error fetching all activities:", error);
+    }
+  };
+
+  // 모든 일본어 데이터를 불러와서 저장
+  const fetchAllJapanese = async () => {
+    try {
+      const response = await axios.get<ContentItem[]>(
+        `${API_BASE_URL}/japanese`
+      );
+      setAllJapanese(response.data);
+    } catch (error) {
+      console.error("Error fetching all japanese:", error);
+    }
+  };
+
+  // 활동 페이지네이션 데이터를 가져오는 함수
   const fetchPaginatedActivities = async (page: number) => {
     try {
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
@@ -165,7 +199,7 @@ const Japan: React.FC = () => {
   const handleActivitiesPagination = (direction: "prev" | "next") => {
     if (
       direction === "next" &&
-      activitiesPage * ITEMS_PER_PAGE < totalActivities
+      activitiesPage * ITEMS_PER_PAGE < filteredActivities.length
     ) {
       setActivitiesPage((prev) => prev + 1);
     } else if (direction === "prev" && activitiesPage > 1) {
@@ -254,7 +288,10 @@ const Japan: React.FC = () => {
 
   // 일본어의 페이지네이션 함수
   const handleJapanesePagination = (direction: "prev" | "next") => {
-    if (direction === "next" && japanesePage < totalJapanese) {
+    if (
+      direction === "next" &&
+      japanesePage * 1 < filteredJapanese.length
+    ) {
       setJapanesePage((prev) => prev + 1);
     } else if (direction === "prev" && japanesePage > 1) {
       setJapanesePage((prev) => prev - 1);
@@ -270,6 +307,39 @@ const Japan: React.FC = () => {
     fetchPaginatedJapanese(japanesePage);
   }, [japanesePage]);
 
+  // 검색어 상태 정의
+  const [activitiesSearchTerm, setActivitiesSearchTerm] = useState<string>("");
+  const [japaneseSearchTerm, setJapaneseSearchTerm] = useState<string>("");
+
+  // 검색어에 따라 필터링된 활동 목록을 반환
+  const filteredActivities = allActivities.filter((activity) => {
+    const searchTerm = activitiesSearchTerm.toLowerCase();
+    return (
+      activity.email?.toLowerCase().includes(searchTerm) ||
+      activity.title?.toLowerCase().includes(searchTerm)
+    );
+  });
+
+  // 검색어에 따라 필터링된 일본어 게시물 목록을 반환
+  const filteredJapanese = allJapanese.filter((japanese) => {
+    const searchTerm = japaneseSearchTerm.toLowerCase();
+    return (
+      japanese.email?.toLowerCase().includes(searchTerm) ||
+      japanese.title?.toLowerCase().includes(searchTerm)
+    );
+  });
+  
+  // 검색 결과 페이지네이션
+  const getPaginatedResults = (items: ContentItem[], page: number, limit: number) => {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    return items.slice(startIndex, endIndex);
+  };
+
+  // 페이지네이션 데이터를 가져오는 함수
+  const paginatedActivities = getPaginatedResults(filteredActivities, activitiesPage, ITEMS_PER_PAGE);
+  const paginatedJapanese = getPaginatedResults(filteredJapanese, japanesePage, 1);
+
   return (
     <div className="p-5 h-screen w-full m-auto">
       {/* Activities Section */}
@@ -277,6 +347,8 @@ const Japan: React.FC = () => {
         <SearchCreateSection
           placeholder="Search Activities"
           onCreate={handleCreateActivity}
+          searchTerm={activitiesSearchTerm}
+          onSearchChange={setActivitiesSearchTerm}
         />
         <div className="relative h-[55vh]">
           <button
@@ -286,7 +358,7 @@ const Japan: React.FC = () => {
             &lt;
           </button>
           <div className="flex overflow-x-auto space-x-4 mx-auto w-[calc(100%-1rem)] justify-center">
-            {activities.map((activity) => (
+            {paginatedActivities.map((activity) => (
               <div
                 key={activity.id}
                 className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
@@ -335,6 +407,8 @@ const Japan: React.FC = () => {
         <SearchCreateSection
           placeholder="Search Japanese"
           onCreate={handleCreateJapanese}
+          searchTerm={japaneseSearchTerm}
+          onSearchChange={setJapaneseSearchTerm}
         />
         <div className="relative h-[20vh]">
           <button
@@ -344,7 +418,7 @@ const Japan: React.FC = () => {
             &lt;
           </button>
           <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
-            {japanese.map((japanese) => (
+            {paginatedJapanese.map((japanese) => (
               <div
                 key={japanese.id}
                 className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4 cursor-pointer"
