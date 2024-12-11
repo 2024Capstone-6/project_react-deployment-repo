@@ -102,10 +102,17 @@ body {
   padding: 20px;
   max-width: 600px;
   margin: 0 auto;
+  background-color: silver;
 }
 
 .board-title {
-  margin-top: 20px;
+  background-color: #999;
+  font-weight: 1000;
+  font-size: 24px;
+}
+
+.board-content {
+  margin-top: 10px;
 }
 
 .board-image {
@@ -141,7 +148,13 @@ body {
 .delete-button,
 .save-button,
 .cancel-button {
+  margin-top: 5px;
   margin-right: 5px;
+  width: 15%;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #999;
+  float:right;
 }
 
 /* CreateBoard.tsx */

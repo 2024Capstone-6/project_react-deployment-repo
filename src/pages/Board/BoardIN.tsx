@@ -114,14 +114,14 @@ const BoardIN: React.FC = () => {
 
    return (
       <div className="container">
-         <h1>{board.title}</h1> {/* 게시글 제목 */}
-         <div className="board-title">
-            {board.content} {/* 게시글 내용 */}
-         </div>
+         <p className="board-title">{board.title}</p> {/* 게시글 제목 */}
          <p>작성시간: {board.date}</p>
          {board.imgurl && (
             <img src={board.imgurl} alt="게시글 이미지" className="board-image" />
          )}
+         <div className="board-content">
+            {board.content} {/* 게시글 내용 */}
+         </div>
          <button onClick={() => navigate(`/updateBoard/${idx}`)} className="edit-button">수정하기</button> {/* 수정하기 버튼 */}
          <button onClick={async () => {
             try {
