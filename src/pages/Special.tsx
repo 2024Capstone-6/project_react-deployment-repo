@@ -1,6 +1,6 @@
 import { setId } from '@material-tailwind/react/components/Tabs/TabsContext'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef} from 'react'
 import { children } from 'solid-js'
 import Add_Modal from '../components/Add_Modal'
 import Delete_Modal from '../components/Delete_Modal'
@@ -20,6 +20,7 @@ const Special = () => {
   const [author,setAuthor] = useState('')
   const [accessor,setAccesor ] = useState('')
   const [toggle,setToggle ] = useState(true)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(()=>{
     rand() 
@@ -114,6 +115,9 @@ const Special = () => {
         <form onSubmit={
           (e)=>{
             e.preventDefault()
+            if (inputRef.current){
+              inputRef.current.blur()
+            }
             const answer = e.currentTarget.answer.value // input창의 값 읽어옴.
             checkAnswer(answer)
             e.currentTarget.answer.value = ''
@@ -125,6 +129,7 @@ const Special = () => {
             placeholder="입력창."
             name='answer'
             className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            ref = {inputRef}
           />
           <button
             type="submit"
