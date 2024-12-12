@@ -1,3 +1,5 @@
+/* Board.tsx */
+
 div,input,textarea {
   box-sizing: border-box;
   text-align: center;
@@ -10,15 +12,19 @@ body {
 .mainpage {
   background-color: whitesmoke;
   width: 60%;
-  height: 800px;
   float: left;
   padding: 10px;
+  border: 4px solid black;
+  border-radius: 5px;
 }
 
-.createPost {
-  background-color: blue;
+.createBoard {
+  background-color: aquamarine;
   float: right;
-  cursor: pointer
+  cursor: pointer;
+  border: 1px solid black;
+  border-radius: 4px;
+  margin-top: 10px;
 }
 
 .bestpage {
@@ -31,4 +37,224 @@ body {
 
 .boardbox {
   background-color: white;
+  cursor: pointer;
+}
+
+.boardlist {
+  border: 1px solid black;
+  border-radius: 3px;
+  margin: '10px';
+  padding: '10px'
+}
+
+.board1 {
+  float: left;
+  margin-right: 5px;
+}
+.board2 {
+  float: left;
+  margin-right: 5px;
+}
+.board3 {
+  text-align: left;
+}
+
+.imgbox {
+  max-width: 500px; 
+  max-height: 400px; 
+  padding: 20px;
+  margin-left:auto;
+  margin-right:auto
+}
+
+.clear {
+  clear: both;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button,
+.pagination span {
+  margin: 0 5px;
+}
+
+.pagination button.active {
+  background-color: #007BFF;
+  color: white;
+}
+
+.pagination button[disabled] {
+  background-color: #ccc;
+}
+
+.pagination .ellipsis {
+  color: #999;
+}
+
+/*BoardIN.tsx */
+
+.container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: silver;
+}
+
+.board-title {
+  background-color: #999;
+  font-weight: 1000;
+  font-size: 24px;
+}
+
+.board-content {
+  margin-top: 10px;
+}
+
+.board-image {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.comment-section {
+  margin-top: 40px;
+}
+
+.comment-box {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+.textarea {
+  width: 100%;
+  height: 60px;
+}
+
+.file-input {
+  display: block;
+  margin-top: 10px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+}
+
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+  margin-top: 5px;
+  margin-right: 5px;
+  width: 15%;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #999;
+  float:right;
+}
+
+/* CreateBoard.tsx */
+
+.container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input,
+.textarea,
+.file-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.textarea {
+  resize: none;
+}
+
+.file-input {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: #fff;
+  border-radius: 4px;
+  border: none;
+}
+
+.submit-button.disabled {
+  background-color: #ccc;
+}
+
+.submit-button:not(.disabled) {
+  cursor: pointer;
+}
+
+/* UpdateBoard.tsx */
+
+.container {
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input,
+.textarea,
+.file-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.textarea {
+  resize: none;
+}
+
+.file-input {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: #fff;
+  border-radius: 4px;
+  border: none;
+}
+
+.submit-button.disabled {
+  background-color: #ccc;
+}
+
+.submit-button:not(.disabled) {
+  cursor: pointer;
 }
