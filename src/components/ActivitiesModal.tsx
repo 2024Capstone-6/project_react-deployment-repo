@@ -82,12 +82,8 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
 
     try {
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
-
       const formData = new FormData();
       formData.append("email", userEmail);
-      formData.append("date", formattedDate);
       formData.append("title", activity.title.trim());
       formData.append("content", activity.content.trim());
 
@@ -150,7 +146,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       try {
         await axios.delete(`${API_BASE_URL}/activities/${activityId}`);
         await refreshActivities();
-        onClose(false);
+        onClose(true);
       } catch (error) {
         console.error("Error deleting activity:", error);
       }

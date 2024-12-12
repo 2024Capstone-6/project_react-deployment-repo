@@ -122,7 +122,7 @@ const BoardIN: React.FC = () => {
          <div className="board-content">
             {board.content} {/* 게시글 내용 */}
          </div>
-         <button onClick={() => navigate(`/updateBoard/${idx}`)} className="edit-button">수정하기</button> {/* 수정하기 버튼 */}
+         <button onClick={() => navigate(`/board/update/${idx}`)} className="edit-button">수정하기</button> {/* 수정하기 버튼 */}
          <button onClick={async () => {
             try {
                await axios.delete(`http://localhost:3001/board/${idx}`);

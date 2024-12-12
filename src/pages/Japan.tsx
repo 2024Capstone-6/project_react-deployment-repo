@@ -88,7 +88,7 @@ const Japan: React.FC = () => {
   // 모든 데이터를 저장
   const [allActivities, setAllActivities] = useState<ContentItem[]>([]);
   const [allJapanese, setAllJapanese] = useState<ContentItem[]>([]);
-  
+
   // 모든 활동 데이터를 불러와서 저장
   const fetchAllActivities = async () => {
     try {
@@ -171,27 +171,31 @@ const Japan: React.FC = () => {
   };
 
   // 활동 모달 닫기 함수
-  const handleActivitiesModalClose = async () => {
+  const handleActivitiesModalClose = async (isNewItem: boolean) => {
     setIsActivitiesModalOpen(false);
-    try {
-      const response = await axios.get<{ items: ContentItem[]; total: number }>(
-        `${API_BASE_URL}/activities/page`,
-        {
+    await fetchAllActivities(); // 전체 데이터 새로고침
+
+    if (isNewItem) {
+      try {
+        const response = await axios.get<{
+          items: ContentItem[];
+          total: number;
+        }>(`${API_BASE_URL}/activities/page`, {
           params: {
             page: activitiesPage,
             limit: ITEMS_PER_PAGE,
           },
-        }
-      );
+        });
 
-      if (response.data.items.length === 0 && activitiesPage > 1) {
-        setActivitiesPage((prev) => prev - 1);
-      } else {
-        await refreshActivities();
+        if (response.data.items.length === 0 && activitiesPage > 1) {
+          setActivitiesPage((prev) => prev - 1);
+        } else {
+          await refreshActivities();
+        }
+      } catch (error) {
+        console.error("Error checking page data:", error);
+        alert("데이터 확인에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Error checking page data:", error);
-      alert("데이터 확인에 실패했습니다.");
     }
   };
 
@@ -263,35 +267,36 @@ const Japan: React.FC = () => {
   };
 
   // 일본어 모달 닫기 함수
-  const handleJapaneseModalClose = async () => {
+  const handleJapaneseModalClose = async (isNewItem: boolean) => {
     setIsJapaneseModalOpen(false);
-    try {
-      const response = await axios.get<{ items: ContentItem[]; total: number }>(
-        `${API_BASE_URL}/japanese/page`,
-        {
+    await fetchAllJapanese(); // 전체 데이터 새로고침
+
+    if (isNewItem) {
+      try {
+        const response = await axios.get<{
+          items: ContentItem[];
+          total: number;
+        }>(`${API_BASE_URL}/japanese/page`, {
           params: {
             page: japanesePage,
           },
-        }
-      );
+        });
 
-      if (response.data.items.length === 0 && japanesePage > 1) {
-        setJapanesePage((prev) => prev - 1);
-      } else {
-        await refreshJapanese();
+        if (response.data.items.length === 0 && japanesePage > 1) {
+          setJapanesePage((prev) => prev - 1);
+        } else {
+          await refreshJapanese();
+        }
+      } catch (error) {
+        console.error("Error checking page data:", error);
+        alert("데이터 확인에 실패했습니다.");
       }
-    } catch (error) {
-      console.error("Error checking page data:", error);
-      alert("데이터 확인에 실패했습니다.");
     }
   };
 
   // 일본어의 페이지네이션 함수
   const handleJapanesePagination = (direction: "prev" | "next") => {
-    if (
-      direction === "next" &&
-      japanesePage * 1 < filteredJapanese.length
-    ) {
+    if (direction === "next" && japanesePage * 1 < filteredJapanese.length) {
       setJapanesePage((prev) => prev + 1);
     } else if (direction === "prev" && japanesePage > 1) {
       setJapanesePage((prev) => prev - 1);
@@ -328,17 +333,29 @@ const Japan: React.FC = () => {
       japanese.title?.toLowerCase().includes(searchTerm)
     );
   });
-  
+
   // 검색 결과 페이지네이션
-  const getPaginatedResults = (items: ContentItem[], page: number, limit: number) => {
+  const getPaginatedResults = (
+    items: ContentItem[],
+    page: number,
+    limit: number
+  ) => {
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
     return items.slice(startIndex, endIndex);
   };
 
   // 페이지네이션 데이터를 가져오는 함수
-  const paginatedActivities = getPaginatedResults(filteredActivities, activitiesPage, ITEMS_PER_PAGE);
-  const paginatedJapanese = getPaginatedResults(filteredJapanese, japanesePage, 1);
+  const paginatedActivities = getPaginatedResults(
+    filteredActivities,
+    activitiesPage,
+    ITEMS_PER_PAGE
+  );
+  const paginatedJapanese = getPaginatedResults(
+    filteredJapanese,
+    japanesePage,
+    1
+  );
 
   return (
     <div className="p-5 h-screen w-full m-auto">

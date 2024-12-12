@@ -78,12 +78,8 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
 
     try {
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
-
       const newJapanese = {
         email: userEmail,
-        date: formattedDate,
         title: japanese.title.trim(),
         content: japanese.content.trim(),
       };
@@ -132,7 +128,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       try {
         await axios.delete(`${API_BASE_URL}/japanese/${japaneseId}`);
         await refreshJapanese();
-        onClose(false);
+        onClose(true);
       } catch (error) {
         console.error("Error deleting japanese:", error);
         alert("게시물 삭제에 실패했습니다.");

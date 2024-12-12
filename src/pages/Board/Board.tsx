@@ -86,7 +86,7 @@ const BoardPage: React.FC = () => {
             <p>게시글이 없습니다.</p> // 게시글이 없을 때 메시지 표시
           ) : (
             board.map((item) => (
-              <div key={item.id} className="boardlist" onClick={() => navigate(`${item.id}`)}>
+              <div key={item.id} className="boardlist" onClick={() => navigate(`/board/in/${item.id}`)}>
                 <h2 className="board1">번호: {item.id}</h2>
                 <h2 className="board2">{item.title}</h2>
                 <div className="clear">
@@ -101,7 +101,7 @@ const BoardPage: React.FC = () => {
             ))
           )}
         </div>
-        <div className="createBoard" onClick={() => navigate('/createBoard')}>
+        <div className="createBoard" onClick={() => navigate('/board/create')}>
           글쓰기
         </div>
 
