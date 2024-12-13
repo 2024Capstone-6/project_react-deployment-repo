@@ -68,7 +68,7 @@ function App() {
                 }
               />
               <Route
-                path="/board/create"
+                path="/createBoard"
                 element={
                   <PrivateRoute user={user}>
                     <CreateBoard />
@@ -76,7 +76,7 @@ function App() {
                 }
               />
               <Route
-                path="/board/update/:idx"
+                path="/updateBoard/:idx"
                 element={
                   <PrivateRoute user={user}>
                     <UpdateBoard />
@@ -84,7 +84,7 @@ function App() {
                 }
               />
               <Route
-                path="/board/in/:idx"
+                path="/board/:idx"
                 element={
                   <PrivateRoute user={user}>
                     <BoardIN />
