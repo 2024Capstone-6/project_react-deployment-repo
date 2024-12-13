@@ -361,46 +361,54 @@ const Japan: React.FC = () => {
           onSearchChange={setActivitiesSearchTerm}
         />
         <div className="relative h-[55vh]">
-          <button
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-            onClick={() => handleActivitiesPagination("prev")}
-          >
-            &lt;
-          </button>
-          <div className="flex overflow-x-auto space-x-4 mx-auto w-[calc(100%-1rem)] justify-center">
-            {paginatedActivities.map((activity) => (
-              <div
-                key={activity.id}
-                className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
-                onClick={() => handleActivityClick(activity.id)}
+          {totalActivities === 0 ? (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <p className="text-gray-500">게시물이 존재하지 않습니다.</p>
+            </div>
+          ) : (
+            <>
+              <button
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
+                onClick={() => handleActivitiesPagination("prev")}
               >
-                {/* 게시물의 사진을 표시 */}
-                {activity.mediaUrl ? (
-                  <img
-                    src={activity.mediaUrl}
-                    alt={`Activity ${activity.id}`}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  // 사진이 없는 경우 기본 배경 표시
-                  <div className="flex items-center justify-center w-full h-full bg-gray-300 text-gray-700">
-                    No Image
+                &lt;
+              </button>
+              <div className="flex overflow-x-auto space-x-4 mx-auto w-[calc(100%-1rem)] justify-center">
+                {paginatedActivities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="w-[30%] h-[55vh] bg-gray-200 flex-shrink-0 overflow-hidden relative"
+                    onClick={() => handleActivityClick(activity.id)}
+                  >
+                    {/* 게시물의 사진을 표시 */}
+                    {activity.mediaUrl ? (
+                      <img
+                        src={activity.mediaUrl}
+                        alt={`Activity ${activity.id}`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      // 사진이 없는 경우 기본 배경 표시
+                      <div className="flex items-center justify-center w-full h-full bg-gray-300 text-gray-700">
+                        No Image
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
-          <button
-            className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
-              activitiesPage * ITEMS_PER_PAGE >= totalActivities
-                ? "text-gray-300"
-                : ""
-            }`}
-            onClick={() => handleActivitiesPagination("next")}
-            disabled={activitiesPage * ITEMS_PER_PAGE >= totalActivities}
-          >
-            &gt;
-          </button>
+              <button
+                className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
+                  activitiesPage * ITEMS_PER_PAGE >= totalActivities
+                    ? "text-gray-300"
+                    : ""
+                }`}
+                onClick={() => handleActivitiesPagination("next")}
+                disabled={activitiesPage * ITEMS_PER_PAGE >= totalActivities}
+              >
+                &gt;
+              </button>
+            </>
+          )}
           {/* 모달 컴포넌트 추가 */}
           <ActivitiesModal
             isOpen={isActivitiesModalOpen}
@@ -421,37 +429,45 @@ const Japan: React.FC = () => {
           onSearchChange={setJapaneseSearchTerm}
         />
         <div className="relative h-[20vh]">
-          <button
-            onClick={() => handleJapanesePagination("prev")}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
-          >
-            &lt;
-          </button>
-          <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
-            {paginatedJapanese.map((japanese) => (
-              <div
-                key={japanese.id}
-                className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4 cursor-pointer"
-                onClick={() => handleJapaneseClick(japanese.id)}
+          {totalJapanese === 0 ? (
+            <div className="w-full h-full flex items-center justify-center bg-gray-100">
+              <p className="text-gray-500">게시물이 존재하지 않습니다.</p>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => handleJapanesePagination("prev")}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 rounded"
               >
-                <h1 className="text-xl font-bold">{japanese.title}</h1>
-                <p className="text-sm text-gray-500">{japanese.email}</p>
-                <p className="text-sm text-gray-500">{japanese.date}</p>
-                <p className="text-sm whitespace-pre-wrap overflow-hidden">
-                  {japanese.content}
-                </p>
+                &lt;
+              </button>
+              <div className="flex overflow-x-auto space-x-4 mx-auto w-[92%] justify-center">
+                {paginatedJapanese.map((japanese) => (
+                  <div
+                    key={japanese.id}
+                    className="w-full h-[20vh] bg-gray-200 flex flex-col text-left justify-center p-4 cursor-pointer"
+                    onClick={() => handleJapaneseClick(japanese.id)}
+                  >
+                    <h1 className="text-xl font-bold">{japanese.title}</h1>
+                    <p className="text-sm text-gray-500">{japanese.email}</p>
+                    <p className="text-sm text-gray-500">{japanese.date}</p>
+                    <p className="text-sm whitespace-pre-wrap overflow-hidden">
+                      {japanese.content}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <button
-            className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
-              japanesePage >= totalJapanese ? "text-gray-300" : ""
-            }`}
-            onClick={() => handleJapanesePagination("next")}
-            disabled={japanesePage >= totalJapanese}
-          >
-            &gt;
-          </button>
+              <button
+                className={`absolute right-0 top-1/2 transform -translate-y-1/2 p-2 rounded ${
+                  japanesePage >= totalJapanese ? "text-gray-300" : ""
+                }`}
+                onClick={() => handleJapanesePagination("next")}
+                disabled={japanesePage >= totalJapanese}
+              >
+                &gt;
+              </button>
+            </>
+          )}
         </div>
         {/* Japanese 모달 컴포넌트 추가 */}
         <JapaneseModal
