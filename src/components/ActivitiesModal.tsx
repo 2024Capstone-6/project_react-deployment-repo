@@ -76,6 +76,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 
   // 활동 생성
   const handleCreateActivity = async () => {
+    await refreshActivities()
     if (!activity.title.trim() || !activity.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;

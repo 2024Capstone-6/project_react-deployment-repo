@@ -8,7 +8,7 @@ export default function Navbar() {
     { path: "/member", label: "Member" },
     { path: "/japan", label: "Japan" },
     { path: "/board", label: "Board" },
-    { path: "/special", label: "Special" },
+    { path: "/special", label: "Quiz" },
   ];
 
   // 로그아웃 처리 함수

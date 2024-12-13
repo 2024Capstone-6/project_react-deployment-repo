@@ -1,25 +1,23 @@
-import { setId } from '@material-tailwind/react/components/Tabs/TabsContext'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { children } from 'solid-js'
-import Add_Modal from '../components/Add_Modal'
-import Delete_Modal from '../components/Delete_Modal'
-import Update_Modal from '../components/Update_Modal'
-import Fail_Modal_Screen from '../components/Fail_Modal'
-import Ok_Modal_Screen from '../components/Ok_Modal'
+import React, { useEffect, useState, useRef} from 'react'
+import Add_Modal from '../components/AddModal'
+import Delete_Modal from '../components/DeleteModal'
+import Update_Modal from '../components/UpdateModal'
+import CheckModal from '../components/CheckModal'
 
 const Special = () => {
   const [add_Modal,setAdd_Modal] = useState(false)
   const [up_Modal,setUp_Modal] = useState(false)
   const [delete_Modal,setDeleteModal] = useState(false)
-  const [Ok_Modal,setOk_Modal]=useState(false)
-  const [Fail_Modal,setFail_Modal] = useState(false)
+  const [Check_Modal,setCheck_Modal]=useState(false)
   const [Question,setQuestion] = useState('')
   const [id,setId] = useState('')
   const [answer,setAnswer] = useState('')
   const [author,setAuthor] = useState('')
   const [accessor,setAccesor ] = useState('')
+  const [inputAnswer,setInputAnswer] = useState('')
   const [toggle,setToggle ] = useState(true)
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(()=>{
     rand() 
@@ -41,11 +39,12 @@ const Special = () => {
 
   
   const checkAnswer = (c:any)=>{
-    if(answer===c){
-      setOkModal()
+    setCheck_Modal(!Check_Modal)
+    if(answer==c){
+      setInputAnswer('success')
     }
     else{
-      setFailModal()
+      setInputAnswer('fail')
     }
   }
   
@@ -64,24 +63,15 @@ const Special = () => {
   const delModal=()=>{
     return setDeleteModal(!delete_Modal)
   }
-  
-  const setOkModal=()=>{
-    return setOk_Modal(!Ok_Modal)
+  const checkModal=()=>{
+    return setCheck_Modal(!Check_Modal)
   }
   
-  const setFailModal=()=>{
-    return setFail_Modal(!Fail_Modal)
-  }
-
   
   return (
 
 
     <div className="flex h-[80vh]">
-      <div className="w-48 bg-gray-800 text-white flex flex-col items-center justify-start pt-8 font-bold text-lg">
-        일본어 퀴즈
-      </div>
-
       <div className="flex flex-col justify-center items-center flex-1 bg-gray-100 space-y-6 relative">
         <button
           className="absolute top-4 right-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
@@ -114,6 +104,9 @@ const Special = () => {
         <form onSubmit={
           (e)=>{
             e.preventDefault()
+            if (inputRef.current){
+              inputRef.current.blur()
+            }
             const answer = e.currentTarget.answer.value // input창의 값 읽어옴.
             checkAnswer(answer)
             e.currentTarget.answer.value = ''
@@ -125,6 +118,7 @@ const Special = () => {
             placeholder="입력창."
             name='answer'
             className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            ref = {inputRef}
           />
           <button
             type="submit"
@@ -133,7 +127,6 @@ const Special = () => {
             enter
           </button>
         </form>
-        
       </div>
 
 
@@ -148,16 +141,11 @@ const Special = () => {
       :''}
       {/* 삭제 모달창 */}
       {delete_Modal ? 
-      <Delete_Modal setModal={delModal} settoggle={settoggle} qid={id}/>
+        <Delete_Modal setModal={delModal} settoggle={settoggle} qid={id}/>
       :''}
-      {/* 성공 모달창 */}
-      {Ok_Modal ? 
-      <Ok_Modal_Screen setModal={setOkModal} settoggle={settoggle} qid={id}/>
-      :''}
-      {/* 실패 모달창 */}
-      {Fail_Modal ? 
-        <Fail_Modal_Screen setModal={setFailModal} settoggle={settoggle} qid={id}/>
-      :''}
+      {Check_Modal?
+        <CheckModal setModal={checkModal} settoggle={settoggle} answer={inputAnswer}/>:''
+      }
     </div>
 
   )
