@@ -1,10 +1,8 @@
-import { setId } from '@material-tailwind/react/components/Tabs/TabsContext'
 import axios from 'axios'
 import React, { useEffect, useState, useRef} from 'react'
-import { children } from 'solid-js'
-import Add_Modal from '../components/Add_Modal'
-import Delete_Modal from '../components/Delete_Modal'
-import Update_Modal from '../components/Update_Modal'
+import Add_Modal from '../components/AddModal'
+import Delete_Modal from '../components/DeleteModal'
+import Update_Modal from '../components/UpdateModal'
 import CheckModal from '../components/CheckModal'
 
 const Special = () => {
