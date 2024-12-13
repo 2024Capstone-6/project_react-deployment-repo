@@ -82,8 +82,16 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
     }
 
     try {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear().toString().slice(2)}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(
+        now.getHours()
+      ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
       const formData = new FormData();
       formData.append("email", userEmail);
+      formData.append("date", formattedDate);
       formData.append("title", activity.title.trim());
       formData.append("content", activity.content.trim());
 

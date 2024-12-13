@@ -44,10 +44,6 @@ const SearchCreateSection: React.FC<{
 
 // 메인 컴포넌트
 const Japan: React.FC = () => {
-  // 데이터 리스트를 저장
-  const [activities, setActivities] = useState<ContentItem[]>([]);
-  const [japanese, setJapanese] = useState<ContentItem[]>([]);
-
   // 데이터의 현재 페이지를 저장
   const [activitiesPage, setActivitiesPage] = useState<number>(1);
   const [japanesePage, setJapanesePage] = useState<number>(1);
@@ -125,7 +121,6 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setActivities(response.data.items);
       setTotalActivities(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated activities:", error);
@@ -145,8 +140,8 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setActivities(response.data.items);
       setTotalActivities(response.data.total);
+      await fetchAllActivities(); // 전체 데이터 업데이트
     } catch (error) {
       console.error("Error fetching activities:", error);
       alert("활동 목록을 불러오는데 실패했습니다.");
@@ -222,7 +217,6 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setJapanese(response.data.items);
       setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching paginated japanese:", error);
@@ -241,7 +235,6 @@ const Japan: React.FC = () => {
           },
         }
       );
-      setJapanese(response.data.items);
       setTotalJapanese(response.data.total);
     } catch (error) {
       console.error("Error fetching japanese:", error);

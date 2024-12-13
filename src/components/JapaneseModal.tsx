@@ -78,8 +78,16 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
 
     try {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear().toString().slice(2)}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(
+        now.getHours()
+      ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
       const newJapanese = {
         email: userEmail,
+        date: formattedDate,
         title: japanese.title.trim(),
         content: japanese.content.trim(),
       };
