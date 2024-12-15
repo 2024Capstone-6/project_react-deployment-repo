@@ -14,7 +14,7 @@ import Member from "./pages/Member";
 import Japan from "./pages/Japan";
 import Board from "./pages/Board/Board";
 import Special from "./pages/Special";
-import CreateBoard from "./pages/Board/CrateBoard";
+import CreateBoard from "./pages/Board/CreateBoard";
 import UpdateBoard from "./pages/Board/UpdateBoard";
 import BoardIN from "./pages/Board/BoardIN";
 
