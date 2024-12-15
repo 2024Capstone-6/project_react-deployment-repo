@@ -3,9 +3,9 @@ import React from 'react';
 // TechStack 컴포넌트가 받을 props의 구조와 타입 정의
 interface TechStackProps {
   techStack: string[]; // 기술 스택 목록, 문자열 배열
-  // 기술 스택 클릭 시 실행할 클릭 이벤트 핸들러
+  // 클릭 시 기술 스택 수정 모달 열림, MemberCard.tsx에서 정의함
   // <HTMLDivElement>: HTML<div> 요소에서 발생한 마우스 이벤트를 나타냄
-  onStackClick?: (e: React.MouseEvent<HTMLDivElement>) => void; // 클릭 이벤트 (선택적)
+  onStackClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const TechStack: React.FC<TechStackProps> = ({ techStack, onStackClick }) => {
@@ -19,10 +19,11 @@ const TechStack: React.FC<TechStackProps> = ({ techStack, onStackClick }) => {
       {techStack.length > 0 ? (
         // 기술 스택이 있는 경우
         techStack.map((stack, index) => (
+          // 기술 스택 이미지 표시
           <img
             key={index}
-            src={`/images/Member/${stack}.png`} // 기술 스택 이미지 경로
-            alt={stack} // 대체 텍스트
+            src={`/images/Member/${stack}.png`} // public의 기술 스택 이미지 경로
+            alt={stack} // 대체 텍스트(기술 스택 이름)
             className="w-10 h-10 rounded-full shadow-md object-cover" // 기술 스택 이미지 스타일
           />
         ))

@@ -178,7 +178,7 @@ const MemberCard: React.FC<MemberCardProps> = ({ memberData, onDelete, onUpdate 
         isImageModalOpen={isImageModalOpen} // Modals.tsx로 이미지 수정 모달의 상태 전달
         isInfoModalOpen={isInfoModalOpen} // 정보 수정 모달의 상태 전달
         isTechStackModalOpen={isTechStackModalOpen} // 기술 스택 수정 모달의 상태 전달
-        info={{ // memberData 객체에서 멤버 정보를 추출해 전달
+        info={{ // memberData 객체에서 각 멤버 정보를 추출해 전달
           name: memberData.name,
           role: memberData.role,
           comment: memberData.comment,
