@@ -1,30 +1,29 @@
 import React from 'react';
 
+// TechStack 컴포넌트가 받을 props의 구조와 타입 정의
 interface TechStackProps {
-  techStack: string[]; // 조원이 보유한 기술 스택 목록
-  onStackClick?: (e: React.MouseEvent<HTMLDivElement>) => void; // 클릭 이벤트 (선택적)
-  onContextMenu?: (e: React.MouseEvent<HTMLDivElement>) => void; // 우클릭 이벤트 (선택적)
+  techStack: string[]; // 기술 스택 목록, 문자열 배열
+  // 클릭 시 기술 스택 수정 모달 열림, MemberCard.tsx에서 정의함
+  // <HTMLDivElement>: HTML<div> 요소에서 발생한 마우스 이벤트를 나타냄
+  onStackClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-const TechStack: React.FC<TechStackProps> = ({ techStack, onStackClick, onContextMenu }) => {
+const TechStack: React.FC<TechStackProps> = ({ techStack, onStackClick }) => {
   return (
     <div
       className={`flex flex-wrap gap-3 w-[28rem] h-44 p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg shadow-md ${
         onStackClick ? 'cursor-pointer' : ''
       }`}
       onClick={onStackClick} // 클릭 이벤트 핸들러 실행
-      onContextMenu={(e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault(); // 기본 우클릭 메뉴 방지
-        onContextMenu?.(e); // 부모 컴포넌트에 우클릭 이벤트 전달
-      }}
     >
       {techStack.length > 0 ? (
         // 기술 스택이 있는 경우
         techStack.map((stack, index) => (
+          // 기술 스택 이미지 표시
           <img
             key={index}
-            src={`/images/Member/${stack}.png`} // 기술 스택 이미지 경로
-            alt={stack} // 대체 텍스트
+            src={`/images/Member/${stack}.png`} // public의 기술 스택 이미지 경로
+            alt={stack} // 대체 텍스트(기술 스택 이름)
             className="w-10 h-10 rounded-full shadow-md object-cover" // 기술 스택 이미지 스타일
           />
         ))
