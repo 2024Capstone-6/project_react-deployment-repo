@@ -8,7 +8,7 @@ const API_BASE_URL = "http://localhost:3001";
 interface JapaneseModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
-  japaneseId: number | null;
+  japaneseId: number | null; // 일본어 ID (null일 경우 생성 모드)
   userEmail: string;
   refreshJapanese: () => Promise<void>;
 }
@@ -32,6 +32,7 @@ const defaultJapanese: Japanese = {
 };
 
 // 컴포넌트 정의
+// 부모 컴포넌트로부터 props를 받아 사용
 const JapaneseModal: React.FC<JapaneseModalProps> = ({
   isOpen,
   onClose,
@@ -63,8 +64,8 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       }
     };
 
-    fetchJapanese();
-  }, [japaneseId]);
+    fetchJapanese(); // 게시물 데이터 가져오기
+  }, [japaneseId]); // japaneseId가 변경될 때마다 게시물 데이터 가져오기
 
   if (!isOpen) {
     return null;
@@ -78,6 +79,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
 
     try {
+      // 현재 날짜 및 시간 가져오기
       const now = new Date();
       const formattedDate = `${now.getFullYear().toString().slice(2)}-${String(
         now.getMonth() + 1
@@ -93,9 +95,9 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       };
 
       await axios.post(`${API_BASE_URL}/japanese`, newJapanese);
-      await refreshJapanese();
-      setJapanese(defaultJapanese);
-      onClose(true);
+      await refreshJapanese(); // 일본어 목록 새로고침
+      setJapanese(defaultJapanese); // 게시물 초기화
+      onClose(true); // 모달 닫기
     } catch (error) {
       console.error("Error creating japanese:", error);
       alert("게시물 생성에 실패했습니다.");

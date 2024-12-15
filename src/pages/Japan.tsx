@@ -1,10 +1,15 @@
+// 상태 관리와 생명주기 관리를 위한 React 훅
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// 모달 컴포넌트
 import ActivitiesModal from "../components/ActivitiesModal";
 import JapaneseModal from "../components/JapaneseModal";
 
+// 백엔드 API 엔드포인트
 const API_BASE_URL = "http://localhost:3001";
+
+// 페이지당 아이템 수
 const ITEMS_PER_PAGE = 3;
 
 // 각 콘텐츠 항목의 데이터 구조를 정의
@@ -20,10 +25,10 @@ interface ContentItem {
 
 // 검색 및 생성 섹션 컴포넌트
 const SearchCreateSection: React.FC<{
-  placeholder: string;
-  onCreate: () => void;
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
+  placeholder: string; // 입력 필드의 힌트 텍스트를 정의
+  onCreate: () => void; // 생성 버튼 클릭 시 호출되는 함수
+  searchTerm: string; // 검색어
+  onSearchChange: (value: string) => void; // 검색어 변경 시 호출되는 함수
 }> = ({ placeholder, onCreate, searchTerm, onSearchChange }) => (
   <div className="flex justify-between items-center mb-4">
     <input
@@ -112,9 +117,11 @@ const Japan: React.FC = () => {
   // 활동 페이지네이션 데이터를 가져오는 함수
   const fetchPaginatedActivities = async (page: number) => {
     try {
+      // 활동 데이터 리스트와 총 활동 데이터 수를 API 응답 데이터의 타입으로 명시
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
         `${API_BASE_URL}/activities/page`,
         {
+          // 페이지 번호와 페이지당 아이템 수를 포함한 쿼리 매개변수
           params: {
             page: page,
             limit: ITEMS_PER_PAGE,
@@ -160,7 +167,6 @@ const Japan: React.FC = () => {
 
   // 활동 카드를 클릭 시 모달 열기
   const handleActivityClick = (id: number) => {
-    console.log(`Card ${id} clicked`);
     setSelectedActivitiesId(id);
     setIsActivitiesModalOpen(true);
   };
@@ -227,6 +233,7 @@ const Japan: React.FC = () => {
   // 일본어 목록을 새로고침하는 함수
   const refreshJapanese = async () => {
     try {
+      // 일본어 데이터 리스트와 총 일본어 데이터 수를 API 응답 데이터의 타입으로 명시
       const response = await axios.get<{ items: ContentItem[]; total: number }>(
         `${API_BASE_URL}/japanese/page`,
         {
@@ -338,7 +345,7 @@ const Japan: React.FC = () => {
     return items.slice(startIndex, endIndex);
   };
 
-  // 페이지네이션 데이터를 가져오는 함수
+  // 검색 결과 페이지네이션 데이터를 가져오는 함수
   const paginatedActivities = getPaginatedResults(
     filteredActivities,
     activitiesPage,
