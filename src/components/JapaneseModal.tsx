@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+// API 서버 주소
 const API_BASE_URL = "http://localhost:3001";
 
+// 부모 컴포넌트로부터 전달받는 props 타입 정의
 interface JapaneseModalProps {
   isOpen: boolean;
   onClose: (isNewItem: boolean) => void;
-  japaneseId: number | null;
+  japaneseId: number | null; // 일본어 ID (null일 경우 생성 모드)
   userEmail: string;
   refreshJapanese: () => Promise<void>;
 }
 
+// 게시물 데이터 타입 정의
 interface Japanese {
   id: number;
   email: string;
@@ -19,6 +22,7 @@ interface Japanese {
   content: string;
 }
 
+// 기본 게시물 데이터 초기값
 const defaultJapanese: Japanese = {
   id: 0,
   email: "",
@@ -27,6 +31,8 @@ const defaultJapanese: Japanese = {
   content: "",
 };
 
+// 컴포넌트 정의
+// 부모 컴포넌트로부터 props를 받아 사용
 const JapaneseModal: React.FC<JapaneseModalProps> = ({
   isOpen,
   onClose,
@@ -34,9 +40,12 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
   userEmail,
   refreshJapanese,
 }) => {
+  // 게시물 데이터 상태 관리
   const [japanese, setJapanese] = useState<Japanese>(defaultJapanese);
+  // 수정 모드 상태 관리
   const [isEditing, setIsEditing] = useState(false);
 
+  // japaneseId가 변경될 때마다 게시물 데이터 가져오기
   useEffect(() => {
     const fetchJapanese = async () => {
       if (japaneseId === null) {
@@ -55,13 +64,14 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       }
     };
 
-    fetchJapanese();
-  }, [japaneseId]);
+    fetchJapanese(); // 게시물 데이터 가져오기
+  }, [japaneseId]); // japaneseId가 변경될 때마다 게시물 데이터 가져오기
 
   if (!isOpen) {
     return null;
   }
 
+  // 일본어 생성
   const handleCreateJapanese = async () => {
     if (!japanese.title.trim() || !japanese.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -69,8 +79,13 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
 
     try {
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
+      // 현재 날짜 및 시간 가져오기
+      const now = new Date();
+      const formattedDate = `${now.getFullYear().toString().slice(2)}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(
+        now.getHours()
+      ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
       const newJapanese = {
         email: userEmail,
@@ -80,15 +95,16 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       };
 
       await axios.post(`${API_BASE_URL}/japanese`, newJapanese);
-      await refreshJapanese();
-      setJapanese(defaultJapanese);
-      onClose(true);
+      await refreshJapanese(); // 일본어 목록 새로고침
+      setJapanese(defaultJapanese); // 게시물 초기화
+      onClose(true); // 모달 닫기
     } catch (error) {
       console.error("Error creating japanese:", error);
       alert("게시물 생성에 실패했습니다.");
     }
   };
 
+  // 일본어 수정
   const handleEditJapanese = async () => {
     if (!japanese.title.trim() || !japanese.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
@@ -114,6 +130,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
   };
 
+  // 일본어 삭제
   const handleDeleteJapanese = async () => {
     const isConfirmed = window.confirm("정말로 이 게시물을 삭제하시겠습니까?");
 
@@ -121,7 +138,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
       try {
         await axios.delete(`${API_BASE_URL}/japanese/${japaneseId}`);
         await refreshJapanese();
-        onClose(false);
+        onClose(true);
       } catch (error) {
         console.error("Error deleting japanese:", error);
         alert("게시물 삭제에 실패했습니다.");
@@ -129,6 +146,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
     }
   };
 
+  // 게시물 작성자 확인
   const isOwner = () => {
     return japanese?.email === userEmail;
   };
@@ -176,7 +194,7 @@ const JapaneseModal: React.FC<JapaneseModalProps> = ({
             </div>
           </div>
         ) : japanese ? (
-          // 게시물 수정/조회
+          // 게시물 수정
           <div className="flex w-full h-full items-center justify-center">
             <div className="w-1/2 flex flex-col text-left">
               {isEditing ? (

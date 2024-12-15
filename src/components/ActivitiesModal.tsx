@@ -1,3 +1,4 @@
+// React 훅, 컴포넌트 상태 및 생명주기 관리를 위한 훅
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -6,10 +7,10 @@ const API_BASE_URL = "http://localhost:3001";
 
 // 활동 모달 컴포넌트의 속성 타입 정의
 interface ActivitiesModalProps {
-  isOpen: boolean;
-  onClose: (isNewItem: boolean) => void;
-  activityId: number | null;
-  userEmail: string;
+  isOpen: boolean; // 모달 열기 상태
+  onClose: (isNewItem: boolean) => void; // 모달 닫기 함수
+  activityId: number | null; // 활동 ID (null일 경우 생성 모드)
+  userEmail: string; // 사용자 이메일
   refreshActivities: () => Promise<void>; // 활동 데이터 새로고침 함수
 }
 
@@ -33,7 +34,7 @@ const defaultActivity: Activity = {
   mediaUrl: "",
 };
 
-// 활동 생성, 수정, 삭제를 위한 모달 컴포넌트
+// 활동 생성, 수정, 삭제를 위한 모달 컴포넌트, 부모 컴포넌트로부터 props를 받아 사용
 const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   isOpen,
   onClose,
@@ -41,8 +42,11 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
   userEmail,
   refreshActivities,
 }) => {
+  // 활동 상태 관리
   const [activity, setActivity] = useState<Activity>(defaultActivity);
+  // 활동 수정 상태 관리
   const [isEditing, setIsEditing] = useState(false);
+  // 선택된 파일 상태 관리
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   // activityId가 변경될 때마다 활동 데이터 가져오기
@@ -76,16 +80,25 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
 
   // 활동 생성
   const handleCreateActivity = async () => {
+    await refreshActivities();
+    // 제목과 내용이 모두 입력되었는지 확인
     if (!activity.title.trim() || !activity.content.trim()) {
       alert("제목과 내용을 모두 입력해주세요.");
       return;
     }
 
     try {
-      const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
+      // 현재 날짜 및 시간 가져오기
+      const now = new Date();
+      const formattedDate = `${now.getFullYear().toString().slice(2)}-${String(
+        now.getMonth() + 1
+      ).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(
+        now.getHours()
+      ).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
+      // 폼 데이터 생성 - 파일이나 키-값 쌍 데이터를 포함
       const formData = new FormData();
+      // formData.append("key", value)로 데이터를 추가
       formData.append("email", userEmail);
       formData.append("date", formattedDate);
       formData.append("title", activity.title.trim());
@@ -96,15 +109,17 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       }
 
       await axios.post(`${API_BASE_URL}/activities`, formData, {
+        // 파일 업로드 시 필요한 헤더 설정
         headers: {
+          // 요청 데이터의 형식을 명시
           "Content-Type": "multipart/form-data",
         },
       });
 
-      await refreshActivities();
-      setActivity(defaultActivity);
-      setSelectedFile(null);
-      onClose(true);
+      await refreshActivities(); // 활동 목록 새로고침
+      setActivity(defaultActivity); // 활동 초기화
+      setSelectedFile(null); // 선택된 파일 초기화
+      onClose(true); // 모달 닫기
     } catch (error) {
       console.error("Error creating activity:", error);
       alert("활동 생성에 실패했습니다.");
@@ -133,9 +148,9 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
         },
       });
 
-      await refreshActivities();
-      setIsEditing(false);
-      setSelectedFile(null);
+      await refreshActivities(); // 활동 목록 새로고침
+      setIsEditing(false); // 수정 모드 종료
+      setSelectedFile(null); // 선택된 파일 초기화
     } catch (error) {
       console.error("Error editing activity:", error);
       alert("활동 수정에 실패했습니다.");
@@ -150,7 +165,7 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       try {
         await axios.delete(`${API_BASE_URL}/activities/${activityId}`);
         await refreshActivities();
-        onClose(false);
+        onClose(true);
       } catch (error) {
         console.error("Error deleting activity:", error);
       }
@@ -174,10 +189,10 @@ const ActivitiesModal: React.FC<ActivitiesModalProps> = ({
       }
 
       setSelectedFile(file);
-      const previewUrl = URL.createObjectURL(file);
+      const previewUrl = URL.createObjectURL(file); // 미리보기 URL 생성
       setActivity({
         ...activity,
-        mediaUrl: previewUrl,
+        mediaUrl: previewUrl, // 미리보기용 임시 URL 저장
       });
     }
   };

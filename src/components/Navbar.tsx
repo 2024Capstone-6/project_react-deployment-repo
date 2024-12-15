@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   // useLocation: 현재 URL 경로 정보를 가져오는 React Router 훅
@@ -13,16 +13,17 @@ export default function Navbar() {
     { path: "/member", label: "Member" },
     { path: "/japan", label: "Japan" },
     { path: "/board", label: "Board" },
-    { path: "/special", label: "Special" },
+    { path: "/special", label: "Quiz" },
   ];
 
-// 로그아웃 처리 함수
-    const handleLogout = () => {
-      // 현재 브라우저의 세션 스토리지 데이터를 모두 삭제
-      // 세션 스토리지: 페이지를 닫거나 새로고침하면 사라지는 임시 저장소
-      sessionStorage.clear();
-      navigate('/login'); // 로그인 페이지로 리다이렉트
-    };
+  // 로그아웃 처리 함수
+  const handleLogout = () => {
+    // 현재 브라우저의 세션 스토리지 데이터를 모두 삭제
+    // 세션 스토리지: 페이지를 닫거나 새로고침하면 사라지는 임시 저장소
+    sessionStorage.clear();
+    navigate("/login"); // 로그인 페이지로 리다이렉트
+    window.location.reload();
+  };
 
   return (
     <div className="fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-md flex flex-col p-4">
@@ -35,10 +36,10 @@ export default function Navbar() {
                 to={route.path}
                 className={`flex items-center p-2 rounded ${
                   location.pathname === route.path
-                    // 현재 경로와 같으면
-                    ? "bg-blue-200"
-                    // 다르면
-                    : "text-gray-700 hover:bg-gray-200"
+                    ? // 현재 경로와 같으면
+                      "bg-blue-200"
+                    : // 다르면
+                      "text-gray-700 hover:bg-gray-200"
                 } no-underline`}
               >
                 {/* 경로 이름 표시 */}
